@@ -1,0 +1,10 @@
+**
+!*.mjs
+!*.cjs
+*-test.mjs
+*.test.mjs
+verify*.mjs
+!web/
+!web/**
+!server-deploy/
+!server-deploy/Dockerfile

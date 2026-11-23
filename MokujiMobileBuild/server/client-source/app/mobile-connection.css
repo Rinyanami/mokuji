@@ -1,0 +1,17 @@
+.duji-mobile-panel{max-width:780px;margin:18px 0;padding:20px;border:1px solid #d9ded1;border-radius:12px;background:#fffefa;color:#30382e}
+.duji-mobile-heading,.duji-mobile-actions,.duji-mobile-url,.duji-mobile-code{display:flex;align-items:center;gap:8px}
+.duji-mobile-heading h2{margin:0;font-size:18px}.duji-mobile-heading>span{margin-left:auto;font-size:12px;color:#5f685b}
+.duji-mobile-heading>.duji-mobile-enabled{color:#3e6649}.duji-mobile-intro,.duji-mobile-note,.duji-mobile-count{margin:10px 0;line-height:1.6;color:#586354;font-size:14px}
+.duji-mobile-address{display:grid;gap:6px;margin:14px 0}.duji-mobile-address select,.duji-mobile-url input{min-width:0;border:1px solid #cbd4c4;border-radius:6px;background:#fff;min-height:36px;padding:5px 8px;color:inherit;font:inherit}
+.duji-mobile-address select{max-width:410px}.duji-mobile-pair{margin:14px 0;padding:14px 16px;background:#f0f4ed;border-radius:8px}
+.duji-mobile-url-list>strong,.duji-mobile-code>strong{font-size:13px}.duji-mobile-url{margin:6px 0}.duji-mobile-url input{flex:1;max-width:460px;font-size:14px;user-select:all}
+.duji-mobile-code{flex-wrap:wrap;margin-top:15px}.duji-mobile-code b{font-family:ui-monospace,monospace;letter-spacing:.13em;font-size:22px}.duji-mobile-code span,.duji-mobile-count,.duji-mobile-note{font-size:12px;color:#596653}
+.duji-mobile-count{margin:8px 0 0}.duji-mobile-actions{margin-top:12px;flex-wrap:wrap}.duji-mobile-actions .button,.duji-mobile-url .button{min-height:34px;display:inline-flex;align-items:center;gap:5px}.duji-mobile-error{color:#923d2a;font-size:14px;margin:10px 0}
+@media(max-width:560px){.duji-mobile-panel{padding:15px}.duji-mobile-pair{padding:12px}.duji-mobile-code{column-gap:6px}.duji-mobile-code span{font-size:11px}}
+
+.mobile-qr{margin:0 0 10px;display:grid;justify-items:start;gap:3px}.mobile-qr svg{background:white;border-radius:4px;border:1px solid #dce6da}.mobile-qr figcaption{font-size:12px;color:#506a53}
+
+.duji-qr-choices{display:inline-flex;flex-wrap:wrap;gap:2px;padding:3px;margin:0 0 14px;border:1px solid #c9d4c4;border-radius:8px;background:#fffefa}
+.duji-qr-choices button{padding:7px 12px;border:0;border-radius:5px;background:transparent;color:#41513e;font:inherit;font-size:14px;cursor:pointer}
+.duji-qr-choices button[aria-pressed=true]{color:#fff;background:#385d45}
+.duji-install-help{padding:6px 2px;color:#315943;font-size:14px;text-decoration:underline;text-underline-offset:3px}

@@ -1,0 +1,70 @@
+.mk-peek {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+  flex: 1 1 auto;
+}
+
+.mk-peek-mask,
+.mk-peek-real {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.mk-peek-real {
+  display: none;
+  color: #6366f1;
+  font-weight: 500;
+}
+
+:is(button, a, .mk-peek-host):hover > .mk-peek > .mk-peek-mask,
+:is(button, a, .mk-peek-host):focus-visible > .mk-peek > .mk-peek-mask,
+:is(button, a, .mk-peek-host):hover .mk-peek > .mk-peek-mask,
+:is(button, a, .mk-peek-host):focus-visible .mk-peek > .mk-peek-mask,
+.mk-reveal-all .mk-peek > .mk-peek-mask {
+  display: none;
+}
+
+:is(button, a, .mk-peek-host):hover > .mk-peek > .mk-peek-real,
+:is(button, a, .mk-peek-host):focus-visible > .mk-peek > .mk-peek-real,
+:is(button, a, .mk-peek-host):hover .mk-peek > .mk-peek-real,
+:is(button, a, .mk-peek-host):focus-visible .mk-peek > .mk-peek-real,
+.mk-reveal-all .mk-peek > .mk-peek-real {
+  display: inline;
+}
+
+:is([data-theme="dark"], .ags-shell, .cx-local, .bd-buddy, .mk-editor:not([data-product="antigravity"][data-surface="web"])) .mk-peek-real {
+  color: #93c5fd;
+}
+
+.mk-reveal-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: inherit;
+  opacity: 0.65;
+  cursor: pointer;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+.mk-reveal-btn:hover {
+  opacity: 1;
+  background: rgba(99, 102, 241, 0.14);
+}
+
+.mk-reveal-btn.is-on {
+  opacity: 1;
+  color: #6366f1;
+  background: rgba(99, 102, 241, 0.14);
+  border-color: rgba(99, 102, 241, 0.35);
+}

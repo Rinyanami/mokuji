@@ -1,0 +1,72 @@
+{
+	admin off
+}
+
+{$DUJI_DOMAIN} {
+	route {
+		header {
+			X-Content-Type-Options nosniff
+			X-Frame-Options DENY
+			Referrer-Policy no-referrer
+			Cache-Control "private, no-store"
+			Strict-Transport-Security "max-age=31536000"
+		}
+		basic_auth {
+			reader {$DUJI_PASSWORD_HASH}
+		}
+
+		@foreign {
+			header Origin *
+			not header Origin https://{$DUJI_DOMAIN}
+		}
+		respond @foreign 403
+
+		@writeWithoutOrigin {
+			method POST PUT PATCH DELETE
+			not header Origin https://{$DUJI_DOMAIN}
+		}
+		respond @writeWithoutOrigin 403
+
+		@api path_regexp public ^/api/(library|catalog|bangumi|connection-mode|reader(?:/(?:books|book|chapter|bind|progress|import|wiki-import|web-fiction|cotex-state|cotex-open))?)/?$
+		handle @api {
+			rewrite * /api/{re.public.1}
+			reverse_proxy 127.0.0.1:5198 {
+				header_up Host 127.0.0.1:5198
+				header_up Origin http://127.0.0.1:5198
+				header_up -Authorization
+				header_up -Cookie
+			}
+		}
+		@appleProfile {
+			method GET HEAD
+			path /install/Mokuji.mobileconfig
+		}
+		handle @appleProfile {
+			reverse_proxy 127.0.0.1:5198 {
+				header_up Host 127.0.0.1:5198
+				header_up Origin http://127.0.0.1:5198
+				header_up -Authorization
+				header_up -Cookie
+			}
+		}
+		@androidPackage path /install/Mokuji-Android.apk
+		header @androidPackage Content-Type application/vnd.android.package-archive
+		header @androidPackage Content-Disposition "attachment; filename=Mokuji-Android.apk"
+		@iphonePackage path /install/Mokuji-iPhone-Unsigned.ipa
+		header @iphonePackage Content-Type application/octet-stream
+		header @iphonePackage Content-Disposition "attachment; filename=Mokuji-iPhone-Unsigned.ipa"
+		@apiOther path /api /api/* /pair /pair/*
+		respond @apiOther 404
+
+		@files {
+			method GET HEAD
+			path / /index.html /favicon.svg /workspace.svg /install /install/ /install/index.html /install/install.js /install/install.css /install/Mokuji-Android.apk /install/Mokuji-iPhone-Unsigned.ipa /assets/* /covers/* /COTEX-LICENSE.txt /QR-CODE-LICENSE.txt /QRCODE-TERMINAL-LICENSE.txt
+		}
+		handle @files {
+			header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://api.bgm.tv https://lain.bgm.tv; font-src 'self' data:; connect-src 'self'; object-src 'none'; frame-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+			root * /srv/web
+			file_server
+		}
+		respond 404
+	}
+}

@@ -1,0 +1,40 @@
+.mokuji-media { margin: 8px 0 14px; font: 13.5px/1.5 var(--sans); }
+.mokuji-media-toggle, .mokuji-media-thumb, .mokuji-media-preview button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 0; background: transparent; color: inherit; font: inherit; cursor: pointer; }
+.mokuji-media-toggle { padding: 4px 0; color: inherit; opacity: 0.85; }
+.mokuji-media-grid { display: flex; gap: 8px; flex-wrap: wrap; margin: 6px 0; }
+.mokuji-media-thumb, .mokuji-media-missing { height: 104px; width: 140px; border: 1px solid color-mix(in srgb, currentColor 20%, transparent); border-radius: 8px; overflow: hidden; padding: 0; display: grid; place-items: center; }
+.mokuji-media-thumb img { width: 100%; height: 100%; object-fit: contain; }
+.mokuji-media-missing { font-size: 12px; gap: 3px; padding: 8px; word-break: break-word; }
+
+.mokuji-media-preview, .mokuji-record-index {
+  position: fixed; inset: 0; margin: auto;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  color: #111827; background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 24px 72px rgba(15, 23, 42, 0.25);
+}
+.mokuji-media-preview { max-width: min(90vw, 1100px); max-height: 90dvh; padding: 14px; }
+.mokuji-media-preview::backdrop, .mokuji-record-index::backdrop { background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(4px); }
+.mokuji-media-preview header, .mokuji-record-index header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 10px; }
+.mokuji-media-preview img { max-width: 100%; max-height: 75dvh; object-fit: contain; display: block; margin: auto; }
+
+.mokuji-record-index { width: min(480px, 94vw); max-height: 82dvh; padding: 16px 18px; font: 13.5px/1.55 var(--sans); }
+.mokuji-record-index button, .mokuji-reader-actions button { font: inherit; cursor: pointer; }
+.mokuji-record-index button { border: 0; border-radius: 7px; background: transparent; color: inherit; text-align: left; }
+.mokuji-record-index button:hover, .mokuji-record-index button:focus-visible, .mokuji-record-index button[aria-current] { background: #f3f4f6; }
+.mokuji-record-index input { width: 100%; font: inherit; border-radius: 8px; border: 1px solid #d1d5db; padding: 8px 11px; outline: none; }
+.mokuji-record-index input:focus { border-color: #5e6ad2; box-shadow: 0 0 0 3px rgba(94, 106, 210, 0.14); }
+.mokuji-index-tabs, .mokuji-reader-actions { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin: 6px 0 10px; }
+.mokuji-index-tabs button, .mokuji-reader-actions button, .mokuji-index-list button, .mokuji-mark-location { display: flex; align-items: center; gap: 7px; padding: 6px 9px; }
+.mokuji-index-tabs button[aria-pressed=true] { background: rgba(94, 106, 210, 0.1); color: #4b56bf; font-weight: 600; }
+.mokuji-index-list { overflow: auto; max-height: 46dvh; margin: 8px 0; scrollbar-width: thin; }
+.mokuji-index-list > button, .mokuji-mark-row > button:first-child { width: 100%; }
+.mokuji-index-list button > span { color: #6b7280; min-width: 32px; font-variant-numeric: tabular-nums; }
+.mokuji-mark-row { display: flex; align-items: center; }
+.mokuji-mark-row > button:last-child { flex: none; }
+.mokuji-mark-toast {
+  position: fixed; bottom: max(16px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
+  z-index: 100; background: #18181b; color: #ffffff; font: 500 12.5px/1.5 var(--sans);
+  padding: 7px 14px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28); border-radius: 8px; pointer-events: none;
+}
+@media(max-width:520px) { .mokuji-media-thumb, .mokuji-media-missing { width: 116px; height: 90px; } }

@@ -1,0 +1,53 @@
+name: duji
+services:
+  gateway:
+    image: caddy:2.11.9-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DUJI_DOMAIN: ${DUJI_DOMAIN:?Set DUJI_DOMAIN in .env}
+      DUJI_PASSWORD_HASH: ${DUJI_PASSWORD_HASH:?Generate the bcrypt hash in .env}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ../web:/srv/web:ro
+      - caddy-data:/data
+      - caddy-config:/config
+  app:
+    build:
+      context: ..
+      dockerfile: server-deploy/Dockerfile
+    restart: unless-stopped
+    init: true
+    network_mode: service:gateway
+    depends_on:
+      gateway:
+        condition: service_started
+        restart: true
+    environment:
+      DUJI_HOSTING_MODE: server
+      DUJI_PUBLIC_ORIGIN: "https://${DUJI_DOMAIN:?Set DUJI_DOMAIN in .env}"
+      DUJI_PORT: "5198"
+      DUJI_DATA_DIR: /data
+      DUJI_KODO_REGION: ${DUJI_KODO_REGION:-}
+      DUJI_KODO_BUCKET: ${DUJI_KODO_BUCKET:-}
+      DUJI_KODO_ACCESS_KEY: ${DUJI_KODO_ACCESS_KEY:-}
+      DUJI_KODO_SECRET_KEY: ${DUJI_KODO_SECRET_KEY:-}
+      DUJI_KODO_PREFIX: ${DUJI_KODO_PREFIX:-duji/reader/v1}
+    volumes:
+      - book-data:/data
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:5198/api/connection-mode').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+volumes:
+  book-data:
+  caddy-data:
+  caddy-config:

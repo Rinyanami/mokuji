@@ -1,0 +1,41 @@
+/* Linear Command-Palette inspired Workspace Switcher */
+.mokuji-project-picker {
+  box-sizing: border-box;
+  width: min(460px, calc(100vw - 28px));
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  background: #1b1c20;
+  color: #eceef2;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(0, 0, 0, 0.4);
+  color-scheme: dark;
+  font: 13.5px/1.5 Inter, -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+.mokuji-project-picker::backdrop { background: rgba(9, 10, 14, 0.6); backdrop-filter: blur(4px); }
+.mokuji-project-picker header, .mokuji-project-picker footer, .mokuji-project-filter, .mokuji-project-actions, .mokuji-project-list > div {
+  display: flex; align-items: center; gap: 8px;
+}
+.mokuji-project-picker header, .mokuji-project-picker footer { justify-content: space-between; padding: 12px 16px; }
+.mokuji-project-picker h2 { font: 600 14px/1.4 inherit; margin: 0; color: inherit; }
+.mokuji-project-picker button {
+  font: inherit; color: inherit; background: none; border: 0; border-radius: 7px;
+  cursor: pointer; display: inline-flex; gap: 8px; align-items: center; padding: 7px 9px;
+}
+.mokuji-project-picker button:not(:disabled):hover, .mokuji-project-picker button[aria-current=page] {
+  background: rgba(94, 106, 210, 0.18);
+  color: #ffffff;
+}
+.mokuji-project-picker button:disabled { opacity: 0.5; }
+.mokuji-project-picker button:focus-visible, .mokuji-project-picker input:focus-visible { outline: 2px solid #5e6ad2; outline-offset: -2px; }
+.mokuji-project-filter { border-block: 1px solid rgba(255, 255, 255, 0.08); padding: 6px 16px; color: #9ca3af; background: #16171b; }
+.mokuji-project-picker input { box-sizing: border-box; min-width: 0; width: 100%; font: inherit; color: #f4f4f5; background: transparent; border: 0; padding: 7px 4px; outline: none; }
+.mokuji-project-list { padding: 8px; max-height: min(48vh, 350px); overflow: auto; scrollbar-width: thin; }
+.mokuji-project-list > div > button:first-child { flex: 1; min-width: 0; text-align: left; overflow-wrap: anywhere; }
+.mokuji-project-list > div > button:first-child svg:last-child:not(:first-child) { margin-left: auto; color: #818cf8; }
+.mokuji-project-picker footer { border-top: 1px solid rgba(255, 255, 255, 0.08); background: #16171b; }
+.mokuji-project-picker kbd { font: 11px ui-monospace, monospace; color: #9ca3af; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.12); }
+.mokuji-project-picker p { margin: 8px 16px 12px; color: #9ca3af; font-size: 12.5px; }
+.mokuji-project-picker p[role=alert] { color: #fca5a5; }
+.mokuji-project-picker form { padding: 4px 16px 16px; }
+.mokuji-project-picker form input { display: block; margin: 6px 0 12px; border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 7px; padding: 7px 10px; background: #141519; }
+.mokuji-project-actions { justify-content: flex-end; }

@@ -1,0 +1,212 @@
+/* Dark Modern & Antigravity IDE workbench styles. All rules are local to this shell. */
+.mk-editor {
+  --ed-bg: #1f1f1f; --ed-panel: #181818; --ed-line: #2b2b2b; --ed-fg: #cccccc;
+  --ed-dim: #9d9d9d; --ed-accent: #0078d4; --ed-hover: #2a2d2e; --ed-selected: #37373d;
+  box-sizing: border-box; width: 100%; height: 100%; min-width: 0; min-height: 0;
+  display: flex; flex-direction: column; overflow: hidden; color-scheme: dark;
+  background: var(--ed-bg); color: var(--ed-fg); font: 13px/1.35 'Segoe UI', system-ui, sans-serif;
+}
+.mk-editor[data-product="antigravity"][data-surface="desktop"] {
+  --ed-bg: #17191f; --ed-panel: #1c1e26; --ed-line: #2e323d; --ed-fg: #e2e6ef; --ed-accent: #7aa7ff;
+  --ed-hover: #282c36; --ed-selected: #303644;
+}
+.mokuji-immersive[data-shell-theme="light"] .mk-editor:not(.mk-manager) {
+  --ed-bg: #ffffff; --ed-panel: #f8f8f8; --ed-line: #e5e5e5; --ed-fg: #1f1f1f;
+  --ed-dim: #616161; --ed-accent: #005fb8; --ed-hover: #ececec; --ed-selected: #e4e6f1;
+  color-scheme: light;
+}
+.mokuji-immersive[data-shell-theme="light"] .mk-editor:not(.mk-manager) .mke-command { background: #ffffff; border-color: #d4d4d8; color: #52525b; }
+.mokuji-immersive[data-shell-theme="light"] .mk-editor:not(.mk-manager) .mke-activity > button { color: #616161; }
+.mokuji-immersive[data-shell-theme="light"] .mk-editor:not(.mk-manager) .mke-activity > [aria-pressed="true"] { color: #1f1f1f; }
+.mokuji-immersive[data-shell-theme="light"] .mk-editor:not(.mk-manager) .mke-file[aria-current] { color: #111827; font-weight: 500; }
+.mokuji-immersive[data-shell-theme="light"] .mk-editor:not(.mk-manager) .mke-searchbox { background: #ffffff; border-color: #d4d4d8; }
+.mokuji-immersive[data-shell-theme="light"] .mk-editor:not(.mk-manager) .mke-popover { background: #ffffff; border-color: #d4d4d8; }
+.mokuji-immersive[data-shell-theme="light"] .mk-editor:not(.mk-manager) .mke-agent-compose { background: #ffffff; border-color: #d4d4d8; }
+.mokuji-immersive[data-shell-theme="light"] .mk-editor:not(.mk-manager) .mke-agent-card { background: #ffffff; }
+.mokuji-immersive[data-shell-theme="light"] .mk-editor:not(.mk-manager) .mke-debug-btn { background: #ffffff; }
+.mokuji-immersive[data-shell-theme="light"] .mk-editor:not(.mk-manager) .mke-accept-btn { color: #ffffff !important; }
+.mokuji-immersive[data-shell-theme="dark"] .mk-editor.mk-manager {
+  --ed-bg: #17191f; --ed-panel: #1c1e26; --ed-fg: #e2e6ef; --ed-line: #2e323d; --ed-dim: #9ba3b4; --ed-hover: #282c36; --ed-selected: #303644; --ed-accent: #7aa7ff; color-scheme: dark;
+}
+.mokuji-immersive[data-shell-theme="dark"] .mk-editor.mk-manager .mke-title,
+.mokuji-immersive[data-shell-theme="dark"] .mk-editor.mk-manager .mke-compose,
+.mokuji-immersive[data-shell-theme="dark"] .mk-editor.mk-manager .mke-searchbox { background: #1e212a; border-color: #323642; }
+.mokuji-immersive[data-shell-theme="dark"] .mk-editor.mk-manager .mke-aux { background: #1c1e26; }
+.mk-editor *, .mk-editor *::after, .mk-editor *::before { box-sizing: border-box; }
+.mk-editor svg { flex: none; }
+.mk-editor button { display: inline-flex; gap: 6px; align-items: center; justify-content: center; appearance: none; border: 0; box-shadow: none; background: transparent; color: inherit; padding: 3px 5px; margin: 0; min-height: 0; font: inherit; text-align: inherit; cursor: pointer; border-radius: 3px; }
+.mk-editor button:hover { background: var(--ed-hover); }
+.mk-editor button:focus-visible, .mk-editor input:focus-visible { outline: 1px solid var(--ed-accent); outline-offset: -1px; }
+.mk-editor button:disabled { opacity: .4; cursor: default; }
+.mk-editor button svg, .mk-editor .mke-side-title svg { width: 16px; height: 16px; stroke-width: 1.6; }
+.mk-editor .mke-title { display: flex; flex: none; gap: 8px; height: 36px; padding-left: 12px; align-items: center; background: var(--ed-panel); border-bottom: 1px solid var(--ed-line); }
+.mk-editor .mke-menubar, .mk-editor .mke-center, .mk-editor .mke-end, .mk-editor .mke-window { display: flex; align-items: center; }
+.mk-editor .mke-menubar { position: relative; gap: 2px; }
+.mk-editor .mke-center { flex: 1; justify-content: center; gap: 3px; min-width: 0; }
+.mk-editor .mke-command { min-width: 80px; width: min(32vw, 440px); border: 1px solid #424246; border-radius: 6px; background: #242428; color: var(--ed-dim); height: 24px; font-size: 12px; padding: 0 8px; }
+.mk-editor .mke-command span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mk-editor .mke-command kbd { margin-left: auto; font: 10px ui-monospace, monospace; opacity: .65; }
+.mk-editor .mke-command svg { width: 13px; height: 13px; }
+.mk-editor .mke-end { padding-right: 5px; gap: 1px; }
+.mk-editor .mke-window { padding: 0 8px 0 14px; gap: 20px; }
+.mk-editor .mke-window svg { width: 13px; height: 13px; stroke-width: 1.3; }
+.mk-editor .mke-window i { font-style: normal; font-size: 12px; }
+.mk-editor .mke-popover { position: absolute; top: calc(100% + 4px); z-index: 25; left: 0; padding: 4px; border: 1px solid #4b4b52; border-radius: 6px; background: var(--ed-bg); min-width: 210px; box-shadow: 0 8px 24px #0006; }
+.mk-editor .mke-popover button { display: flex; justify-content: flex-start; gap: 10px; width: 100%; padding: 6px 10px; font-size: 12.5px; }
+.mk-editor .mke-work { flex: 1; display: flex; min-height: 0; min-width: 0; position: relative; overflow: hidden; }
+.mk-editor .mke-activity { flex: none; width: 48px; display: flex; flex-direction: column; align-items: stretch; background: var(--ed-panel); border-right: 1px solid var(--ed-line); }
+.mk-editor .mke-activity > button { display: grid; place-items: center; position: relative; height: 48px; padding: 0; color: #8c8c94; border-radius: 0; }
+.mk-editor .mke-activity > button svg { width: 22px; height: 22px; stroke-width: 1.4; }
+.mk-editor .mke-activity > [aria-pressed="true"] { color: #e8eaed; box-shadow: inset 2px 0 var(--ed-accent); }
+.mk-editor .mke-act-badge { position: absolute; right: 7px; bottom: 8px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px; background: var(--ed-accent); color: #fff; font: 600 10px/16px system-ui; text-align: center; }
+.mk-editor .mke-fill { flex: 1; min-height: 0; min-width: 0; }
+.mk-editor .mke-side { width: clamp(185px, 18vw, 265px); flex: none; min-height: 0; display: flex; flex-direction: column; background: var(--ed-panel); border-right: 1px solid var(--ed-line); }
+.mk-editor .mke-side-title, .mk-editor .mke-agent-title { display: flex; justify-content: space-between; gap: 6px; align-items: center; padding: 0 10px 0 16px; height: 35px; flex: none; font-size: 11px; font-weight: 500; letter-spacing: .03em; }
+.mk-editor .mke-folder, .mk-editor .mke-dir, .mk-editor .mke-group, .mk-editor .mke-file { width: 100%; justify-content: start; display: flex; align-items: center; gap: 5px; height: 23px; min-height: 23px; border-radius: 0; font-size: 13px; }
+.mk-editor .mke-folder { padding-left: 5px; font-size: 11px; font-weight: 650; }
+.mk-editor .mke-dir { padding-left: 17px; }
+.mk-editor .mke-dir svg { width: 15px; height: 15px; color: #b9a67b; }
+.mk-editor .mke-dir svg:first-child, .mk-editor .mke-group svg:first-child { width: 12px; color: var(--ed-dim); }
+.mk-editor .mke-files, .mk-editor .mke-ws-list { overflow: auto; min-height: 0; scrollbar-width: thin; scrollbar-color: #4a4a4a transparent; }
+.mk-editor .mke-ws-list { max-height: 150px; border-bottom: 1px solid var(--ed-line); }
+.mk-editor .mke-ws-list .mke-file { padding-left: 20px; }
+.mk-editor .mke-file { padding: 0 8px 0 36px; overflow: hidden; }
+.mk-editor .mke-file > span:nth-child(2) { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.mk-editor .mke-file[aria-current] { background: var(--ed-selected); color: #fff; }
+.mk-editor .mke-file small { margin-left: auto; color: var(--ed-dim); font-size: 11px; font-variant-numeric: tabular-nums; }
+.mk-editor .mke-group { padding-left: 22px; }
+.mk-editor .mke-group ~ .mke-file { padding-left: 50px; }
+.mk-editor .mke-md { display: inline-flex; align-items: center; color: #69aede; }
+.mk-editor .mke-md svg { width: 14px; height: 14px; stroke-width: 2.8; }
+.mk-editor .mke-searchbox { display: flex; align-items: center; padding: 0 5px; gap: 5px; background: #2c2c30; border: 1px solid var(--ed-line); margin: 5px; border-radius: 3px; }
+.mk-editor .mke-searchbox > svg { width: 14px; }
+.mk-editor .mke-searchbox input { border: 0; color: inherit; background: transparent; width: 100%; min-width: 0; height: 26px; font: inherit; padding: 2px; }
+.mk-editor .mke-more, .mk-editor .mke-empty { margin: 8px 12px; color: var(--ed-dim); font-size: 12px; }
+.mk-editor .mke-outline { border-top: 1px solid var(--ed-line); }
+.mk-editor .mke-git-box, .mk-editor .mke-debug-box, .mk-editor .mke-ext-list { padding: 8px; overflow: auto; flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.mk-editor .mke-git-commit, .mk-editor .mke-debug-btn { width: 100%; justify-content: center; padding: 6px 8px; border-radius: 4px; background: var(--ed-accent); color: #fff; font-size: 12px; font-weight: 500; }
+.mk-editor .mke-debug-btn { background: #2b2d33; color: var(--ed-fg); border: 1px solid var(--ed-line); justify-content: flex-start; }
+.mk-editor .mke-git-group { font-size: 11px; color: var(--ed-dim); font-weight: 600; margin-top: 4px; }
+.mk-editor .mke-git-row { width: 100%; justify-content: flex-start; padding: 4px 6px; font-size: 12.5px; }
+.mk-editor .mke-git-row small { margin-left: auto; color: var(--ed-dim); font-size: 11px; }
+.mk-editor .mke-git-m { color: #e2c08d; font: 600 11px ui-monospace, monospace; }
+.mk-editor .mke-debug-stat { display: flex; justify-content: space-between; font-size: 12px; padding: 3px 2px; border-bottom: 1px solid var(--ed-line); }
+.mk-editor .mke-debug-stat span { color: var(--ed-dim); }
+.mk-editor .mke-ext-item { width: 100%; justify-content: space-between; padding: 8px; border-radius: 5px; border: 1px solid var(--ed-line); }
+.mk-editor .mke-ext-item.is-active { border-color: var(--ed-accent); background: var(--ed-selected); }
+.mk-editor .mke-ext-item div { display: flex; flex-direction: column; gap: 2px; }
+.mk-editor .mke-ext-item small { color: var(--ed-dim); font-size: 11px; }
+.mk-editor .mke-ext-item > span { font-size: 11px; padding: 2px 7px; border-radius: 4px; background: var(--ed-hover); }
+.mk-editor .mke-ext-item.is-active > span { background: var(--ed-accent); color: #fff; }
+.mk-editor .mke-main, .mk-editor .mke-body { display: flex; flex-direction: column; flex: 1; min-height: 0; min-width: 0; overflow: hidden; }
+.mk-editor .mke-tabs { display: flex; align-items: center; background: var(--ed-panel); border-bottom: 1px solid var(--ed-line); padding-right: 6px; height: 35px; flex: none; }
+.mk-editor .mke-tab-strip { display: flex; align-items: stretch; height: 100%; overflow: auto; scrollbar-width: none; }
+.mk-editor .mke-tab, .mk-editor .mke-active-tab { height: 100%; display: flex; align-items: center; border-right: 1px solid var(--ed-line); font-size: 12.5px; color: var(--ed-dim); }
+.mk-editor .mke-active-tab { color: var(--ed-fg); background: var(--ed-bg); box-shadow: inset 0 1.5px var(--ed-accent); }
+.mk-editor .mke-tab-btn { height: 100%; padding: 0 10px; border-radius: 0; white-space: nowrap; }
+.mk-editor .mke-tab-close { padding: 3px; margin-right: 4px; }
+.mk-editor .mke-tab-close svg { width: 13px; height: 13px; }
+.mk-editor .mke-btn-on { color: var(--ed-accent) !important; }
+.mk-editor .mke-crumb { display: flex; flex: none; align-items: center; gap: 4px; min-width: 0; white-space: nowrap; overflow: hidden; height: 24px; color: var(--ed-dim); padding: 0 14px; font-size: 12px; }
+.mk-editor .mke-crumb > svg { width: 12px; }
+.mk-editor .mke-body .mokuji-shell-text { flex: 1; min-height: 0; height: auto; background: var(--ed-bg); color: var(--ed-fg); border: 0; border-radius: 0; scrollbar-width: thin; scrollbar-color: #525252 transparent; }
+.mk-editor:not(.mk-manager) .mke-body .mokuji-shell-text article { counter-reset: editor-line; max-width: none; padding: 6px 8px 28px; margin: 0; font-family: Consolas, 'Cascadia Mono', 'Microsoft YaHei UI', monospace; line-height: 1.62; }
+.mk-editor:not(.mk-manager) .mke-body .duji-reader-paragraph { counter-increment: editor-line; display: grid; grid-template-columns: 4ch minmax(0, 1fr) 24px; gap: 14px; margin: 0; padding: 2px 4px; background: transparent; border: 0; }
+.mk-editor:not(.mk-manager) .mke-body .duji-reader-paragraph::before { content: counter(editor-line); font: 12px/1.62 Consolas, monospace; margin-top: .22em; text-align: right; color: #72767e; user-select: none; }
+.mk-editor:not(.mk-manager) .mke-body .duji-reader-paragraph.marked { box-shadow: inset 0 0 0 1px #ffffff12; background: rgba(255, 255, 255, .02); }
+.mk-editor:not(.mk-manager) .mke-body .duji-reader-paragraph p { margin: 0; font-size: .78em; white-space: pre-wrap; }
+.mk-editor .mke-body .duji-reader-bookmark { opacity: 0; color: var(--ed-dim); border-radius: 2px; }
+.mk-editor .mke-body .duji-reader-paragraph:is(:hover,:focus-within) .duji-reader-bookmark { opacity: 1; }
+.mk-editor .mke-body .duji-reader-credit { color: var(--ed-dim); border-color: var(--ed-line); }
+.mk-editor .mke-body .duji-reader-credit a { color: #7cb9df; }
+.mk-editor .mke-review-bar { display: flex; align-items: center; justify-content: space-between; padding: 6px 14px; background: var(--ed-panel); border-top: 1px solid var(--ed-line); font-size: 12px; color: var(--ed-dim); }
+.mk-editor .mke-review-bar > div { display: flex; gap: 6px; }
+.mk-editor .mke-review-bar button { padding: 3px 9px; border: 1px solid var(--ed-line); border-radius: 5px; font-size: 11.5px; }
+.mk-editor .mke-accept-btn { background: var(--ed-accent) !important; border-color: transparent !important; color: #111318 !important; font-weight: 600; }
+.mk-editor .mke-aux { display: flex; flex-direction: column; min-height: 0; width: clamp(235px, 24vw, 350px); flex: none; border-left: 1px solid var(--ed-line); background: var(--ed-panel); }
+.mk-editor .mke-agent-title { padding: 0 10px 0 12px; border-bottom: 1px solid var(--ed-line); font-size: 11.5px; }
+.mk-editor .mke-agent-title > div { display: flex; }
+.mk-editor .mke-agent-stream { flex: 1; overflow: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.mk-editor .mke-agent-card { padding: 10px 11px; border-radius: 8px; background: rgba(255, 255, 255, .03); border: 1px solid var(--ed-line); display: flex; flex-direction: column; gap: 8px; }
+.mk-editor .mke-agent-thought { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ed-accent); font-weight: 500; }
+.mk-editor .mke-agent-note { margin: 0; font-size: 12px; color: var(--ed-dim); line-height: 1.5; }
+.mk-editor .mke-agent-note code { font-family: Consolas, monospace; color: var(--ed-fg); }
+.mk-editor .mke-agent-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.mk-editor .mke-agent-chips button { padding: 4px 8px; border-radius: 5px; border: 1px solid var(--ed-line); font-size: 11px; background: var(--ed-bg); }
+.mk-editor .mke-agent-compose { margin: 8px 10px 10px; padding: 8px 9px; border: 1px solid #383c43; border-radius: 8px; background: #262930; font-size: 11.5px; position: relative; }
+.mk-editor .mke-agent-prompt { width: 100%; border: 0; background: transparent; color: var(--ed-fg); padding: 2px 0 10px; font-size: 12.5px; outline: none; }
+.mk-editor .mke-agent-prompt::placeholder { color: var(--ed-dim); }
+.mk-editor .mke-agent-compose > div { display: flex; align-items: center; gap: 5px; }
+.mk-editor .mke-agent-compose > div button { padding: 2px 5px; font-size: 11px; color: var(--ed-dim); }
+.mk-editor .mke-agent-compose > div button svg { width: 11px; height: 11px; }
+.mk-editor .mke-agent-compose > div > button:last-child { margin-left: auto; }
+.mk-editor .mke-pop-anchor { position: relative; display: inline-flex; }
+.mk-editor[data-product="vscode"] .mke-agent-compose { background: #252526; border: 1px solid #424242; border-radius: 6px; }
+.mk-editor .mke-end .mke-agent-switch { margin-right: 6px; border: 1px solid var(--ed-line); border-radius: 4px; font-size: 11px; padding: 3px 8px; }
+.mk-editor .mke-panel { display: flex; flex-direction: column; flex: none; height: min(170px, 26%); padding: 0 14px 8px; background: var(--ed-panel); border-top: 1px solid var(--ed-line); }
+.mk-editor .mke-panel header { display: flex; justify-content: space-between; align-items: center; height: 30px; font-size: 11px; }
+.mk-editor .mke-panel-tabs { display: flex; gap: 12px; height: 100%; }
+.mk-editor .mke-panel-tabs button { height: 100%; border-radius: 0; font-size: 11px; color: var(--ed-dim); border-bottom: 1.5px solid transparent; }
+.mk-editor .mke-panel-tabs button[aria-pressed="true"] { color: var(--ed-fg); border-bottom-color: var(--ed-accent); }
+.mk-editor .mke-panel code { color: var(--ed-dim); margin: 8px 0; font-family: Consolas, monospace; font-size: 12px; }
+.mk-editor .mke-term-form { display: flex; flex-direction: column; flex: 1; gap: 4px; padding-top: 6px; font: 12px/1.5 Consolas, monospace; }
+.mk-editor .mke-term-log { color: var(--ed-dim); }
+.mk-editor .mke-term-input { display: flex; align-items: center; gap: 6px; color: var(--ed-accent); }
+.mk-editor .mke-term-input input { flex: 1; background: transparent; border: 0; color: var(--ed-fg); outline: none; font: inherit; }
+.mk-editor .mke-status { flex: none; display: flex; align-items: center; height: calc(23px + env(safe-area-inset-bottom)); padding: 0 8px env(safe-area-inset-bottom) 0; gap: 8px; background: var(--ed-panel); border-top: 1px solid var(--ed-line); font-size: 11px; white-space: nowrap; }
+.mk-editor .mke-status > span, .mk-editor .mke-status > button { display: inline-flex; align-items: center; gap: 4px; height: 100%; padding: 0 5px; border-radius: 0; }
+.mk-editor .mke-status svg { width: 13px; height: 13px; stroke-width: 1.6; }
+.mk-editor .mke-status .mke-remote { color: white; padding: 0 9px; background: var(--ed-accent); }
+.mk-manager { --ed-bg: #ffffff; --ed-panel: #f6f7f9; --ed-fg: #26272a; --ed-line: #e8e8eb; --ed-dim: #62646b; --ed-hover: #ebedf1; --ed-selected: #e4e7ec; --ed-accent: #5376b1; color-scheme: light; font-family: 'Segoe UI', Arial, sans-serif; }
+.mk-manager .mke-title { height: 44px; gap: 6px; background: #fff; }
+.mk-manager .mke-title strong { font-weight: 550; letter-spacing: -.4px; margin-right: 8px; }
+.mk-manager .mke-command { display: none; }
+.mk-manager .mke-center { justify-content: flex-start; }
+.mk-manager .mke-side { width: clamp(195px, 20vw, 275px); padding: 10px 8px 6px; }
+.mk-manager .mke-project-tools { display: flex; flex-direction: column; gap: 2px; margin-bottom: 8px; }
+.mk-manager .mke-project-tools button, .mk-manager .mke-project-foot, .mk-manager .mke-folder { justify-content: flex-start; gap: 8px; font-size: 13px; border-radius: 6px; padding: 5px 8px; height: 31px; font-weight: 500; }
+.mk-manager .mke-side-title { color: var(--ed-dim); padding: 0 8px; font-size: 12px; }
+.mk-manager .mke-file { padding: 0 8px 0 22px; gap: 7px; height: 29px; border-radius: 5px; }
+.mk-manager .mke-file[aria-current] { color: var(--ed-fg); }
+.mk-manager .mke-searchbox { background: white; }
+.mk-manager .mke-convo-head { height: 48px; padding: 0 20px; display: flex; gap: 8px; align-items: center; border-bottom: 1px solid var(--ed-line); }
+.mk-manager .mke-convo-head > svg { width: 16px; }
+.mk-manager .mke-convo-head span { text-overflow: ellipsis; overflow: hidden; white-space: nowrap; font-weight: 550; }
+.mk-manager .mke-convo-tools { margin-left: auto; display: flex; gap: 4px; }
+.mk-manager .mke-body .mokuji-shell-text article { max-width: 810px; margin: 0 auto; padding: 14px clamp(14px, 3vw, 42px) 32px; font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei UI', sans-serif; line-height: 1.72; }
+.mk-manager .mke-body .duji-reader-paragraph { background: transparent; margin: 0 0 .82em; }
+.mk-manager .mke-body .duji-reader-paragraph p { margin: 0; font-size: .86em; white-space: pre-wrap; }
+.mk-manager .mke-compose { margin: 8px clamp(12px, 4vw, 50px) max(12px, env(safe-area-inset-bottom)); padding: 9px 13px; border: 1px solid #d7d8dc; border-radius: 16px; box-shadow: 0 2px 8px #14161912; background: #fff; position: relative; }
+.mk-manager .mke-compose > input { width: 100%; border: 0; outline: none; background: transparent; font-size: 13.5px; padding: 2px 0 8px; }
+.mk-manager .mke-compose > div { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.mk-manager .mke-compose-left { display: flex; align-items: center; gap: 8px; }
+.mk-manager .mke-compose-left button { font-size: 12px; color: var(--ed-dim); padding: 3px 6px; border-radius: 6px; }
+.mk-manager .mke-aux { margin: 8px; width: clamp(195px, 19vw, 265px); height: max-content; max-height: calc(100% - 16px); border: 1px solid var(--ed-line); border-radius: 10px; background: #f7f7f9; padding: 4px 7px 12px; }
+.mk-manager .mke-overview-row { justify-content: flex-start; gap: 9px; border-radius: 6px; padding: 7px; width: 100%; }
+.mk-manager .mke-overview-row svg:last-child:not(:first-child) { margin-left: auto; }
+.mk-manager .mke-overview-info { padding: 8px 8px 0; font-size: 11px; color: var(--ed-dim); }
+@media(max-width: 760px) {
+  .mk-editor .mke-title { gap: 4px; padding: 0 4px; }
+  .mk-editor .mke-command { width: auto; padding: 0 8px; }
+  .mk-editor .mke-command kbd { display: none; }
+  .mk-editor .mke-center { justify-content: flex-start; }
+  .mk-editor .mke-window { display: none; }
+  .mk-editor .mke-end .mke-agent-switch { display: none; }
+  .mk-editor .mke-menubar { gap: 0; }
+  .mk-editor .mke-menubar > button:not(:first-child) { display: none; }
+  .mk-editor .mke-activity { width: 38px; }
+  .mk-editor .mke-activity > button { height: 42px; }
+  .mk-editor .mke-activity > button svg { width: 19px; height: 19px; }
+  .mk-editor .mke-side, .mk-editor .mke-aux { position: absolute; z-index: 6; top: 0; bottom: 0; width: min(265px, calc(100% - 54px)); box-shadow: 3px 3px 14px #0004; }
+  .mk-editor .mke-side { left: 38px; }
+  .mk-editor .mke-aux { right: 0; }
+  .mk-manager .mke-side { left: 0; }
+  .mk-editor .mke-file { height: 32px; }
+  .mk-editor .mke-status { gap: 4px; }
+  .mk-editor .mke-opt, .mk-editor .mke-status .mke-diag { display: none; }
+  .mk-editor:not(.mk-manager) .mke-body .duji-reader-paragraph { grid-template-columns: 2.3ch minmax(0, 1fr) 17px; gap: 6px; }
+  .mk-editor .mke-body .duji-reader-bookmark { width: 17px; min-width: 0; }
+  .mk-editor .mke-body .duji-reader-bookmark:focus-visible { opacity: 1; }
+  .mk-manager .mke-convo-head { padding: 0 12px; height: 40px; }
+  .mk-manager .mke-body .mokuji-shell-text article { padding: 6px 12px 22px; }
+}

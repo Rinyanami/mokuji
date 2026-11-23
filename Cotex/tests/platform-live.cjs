@@ -1,0 +1,27 @@
+const {_electron:electron,expect}=require('@playwright/test');
+const path=require('node:path'),fs=require('node:fs');
+const executable=process.argv[2]||process.env.COTEX_EXECUTABLE;const root=path.resolve(__dirname,'..'),out=path.join(root,'test-results');const env={...process.env,COTEX_DATA:path.join(out,'platform-live-'+Date.now())};delete env.ELECTRON_RUN_AS_NODE;
+(async()=>{const a=await electron.launch({args:executable?[]:[root],...(executable?{executablePath:executable}:{}),env,timeout:45000});const p=await a.firstWindow();const errors=[];p.on('pageerror',e=>errors.push(e.message));try{
+ await p.waitForSelector('.chapter .prose');
+ const state=await p.evaluate(()=>window.desk.state());console.log(JSON.stringify({version:state.appVersion,sources:state.sources.map(s=>s.id)}));
+ await p.getByRole('button',{name:'搜索小说库 Ctrl+K',exact:true}).click();
+ await p.getByRole('button',{name:'番茄小说',exact:true}).click();
+ await expect(p.locator('.library-book.online').first()).toBeVisible({timeout:60000});
+ const count=await p.locator('.library-book.online').count();console.log(JSON.stringify({officialSearchResults:count}));
+ await p.getByRole('textbox',{name:'搜索书名或作者',exact:true}).fill('https://fanqienovel.com/page/7143038691944959011');
+ await p.getByRole('button',{name:'搜索',exact:true}).click();
+ await expect(p.locator('.library-book.online')).toHaveCount(1,{timeout:60000});
+ await expect(p.locator('.library-book.online')).toContainText('十日终焉');
+ await p.locator('.library-book.online .add-book').click();
+ await expect(p.getByRole('dialog')).toHaveCount(0,{timeout:60000});
+ await expect(p.locator('.chapter .prose').first()).toBeVisible({timeout:60000});
+ const read=await p.evaluate(async()=>{await document.fonts.ready;const state=await window.desk.state(),book=await window.desk.open(state.activeId),c=book.chapters[0];return {title:book.title,firstChapter:c.title,chapters:book.chapters.length,paragraphCount:c.paragraphs?.length,fonts:c.fonts?.length,encoded:c.encoded,fontFamily:getComputedStyle(document.querySelector('.chapter .prose p')).fontFamily,fontLoaded:c.fonts?.every(f=>document.fonts.check('14px CotexFont_'+f.id))};});
+ console.log(JSON.stringify({read}));if(!read.paragraphCount||!read.fontLoaded||!/^第1章/.test(read.firstChapter))throw new Error('Reading/font validation failed');
+ await p.screenshot({path:path.join(out,'platform-fanqie-reading.png')});
+ const before=await p.evaluate(async()=>{const s=await window.desk.state();const b=await window.desk.open(s.activeId);await window.desk.patch(b.id,{progress:{chapter:3,paragraph:2}});return {id:b.id,fonts:b.chapters[0].fonts?.[0]?.id};});
+ const refreshed=await p.evaluate(async id=>{const b=await window.desk.refresh(id);return {progress:b.progress,fonts:b.chapters[0].fonts?.[0]?.id,paragraphs:b.chapters[0].paragraphs?.length};},before.id);
+ if(refreshed.progress.chapter!==3||refreshed.fonts!==before.fonts||!refreshed.paragraphs)throw new Error('Refresh lost progress or font cache');console.log(JSON.stringify({refresh:refreshed,errors}));
+ const toolbarPromise=a.waitForEvent('window');await p.evaluate(()=>window.desk.platformOpen('qidian'));
+ const toolbar=await toolbarPromise;await expect(toolbar.getByRole('button',{name:'加入 Cotex',exact:true})).toBeVisible();await toolbar.screenshot({path:path.join(out,'platform-qidian-window.png')});
+ console.log('LIVE_READING_PASSED');
+ }catch(e){console.error('UI errors:',await p.locator('.inline-error,.error-copy').allTextContents());await p.screenshot({path:path.join(out,'platform-live-failure.png')});throw e;}finally{await a.close();}})().catch(e=>{console.error(e.message);process.exitCode=1;});

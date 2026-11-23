@@ -1,0 +1,26 @@
+# Dependencies & caches
+**/node_modules/
+**/dist/
+out/
+.vite/
+
+# Personal user data, SQLite databases & secrets
+**/data/
+**/*.sqlite
+**/*.sqlite-*
+**/sync-config.json
+**/bangumi-sync.json
+**/.env
+**/.env.*
+!server-deploy/.env.example
+*.p12
+*.jks
+*.keystore
+*.pem
+*.key
+
+# OS & editor artifacts
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log

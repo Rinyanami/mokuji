@@ -1,0 +1,80 @@
+.mokuji-work-summary-host { flex: 1; min-width: 0; min-height: 0; overflow: auto; }
+.work-brief { width: 100%; height: 100%; overflow: auto; color: inherit; font: 14px/1.75 "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; }
+.work-brief-page { max-width: 780px; margin: 0 auto; padding: 28px clamp(18px, 3.5vw, 42px); }
+.work-brief-status { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; opacity: 0.68; margin-bottom: 14px; }
+.work-brief-dot { width: 7px; height: 7px; border-radius: 50%; background: #10b981; }
+.work-brief-page h2 { margin: 0 0 12px; font-family: inherit; font-size: 18px; font-weight: 600; line-height: 1.45; letter-spacing: -0.01em; }
+.work-brief-page p, .work-brief-page ul { margin: 11px 0; opacity: 0.92; }
+.work-brief-page ul { padding-inline-start: 1.35em; list-style: disc; }
+.work-brief-page li { margin: 4px 0; }
+.work-brief-files { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0 22px; }
+.work-brief button, .work-brief-dialog button { display: inline-flex; align-items: center; gap: 7px; color: inherit; font: inherit; background: transparent; border: 0; cursor: pointer; }
+.work-brief .work-brief-files button {
+  color: #5b9cf6;
+  padding: 7px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(128, 128, 128, 0.22);
+  background: rgba(91, 156, 246, 0.06);
+  font-size: 13px;
+  transition: background 140ms ease, border-color 140ms ease;
+}
+.work-brief .work-brief-files button:hover {
+  background: rgba(91, 156, 246, 0.13);
+  border-color: rgba(91, 156, 246, 0.45);
+}
+.work-brief-pdf-icon { flex: none; }
+.work-brief-return {
+  margin-top: 22px;
+  padding: 6px 11px !important;
+  border-radius: 7px;
+  border: 1px solid rgba(128, 128, 128, 0.24) !important;
+  font-size: 12.5px !important;
+  opacity: 0.8;
+}
+.work-brief-return:hover { opacity: 1; background: rgba(128, 128, 128, 0.1); }
+.work-brief-return kbd {
+  font: 10.5px ui-monospace, monospace;
+  padding: 1px 5px;
+  border-radius: 4px;
+  border: 1px solid rgba(128, 128, 128, 0.28);
+  opacity: 0.75;
+}
+.work-brief-dialog {
+  width: min(500px, 94vw);
+  max-height: 82vh;
+  overflow: auto;
+  margin: auto;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 12px;
+  padding: 0;
+  color: #18181b;
+  background: #ffffff;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+}
+.work-brief-dialog::backdrop { background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(4px); }
+.work-brief-dialog header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 13px 18px;
+  border-bottom: 1px solid #eceef2;
+  font-size: 14px;
+}
+.work-brief-dialog-title { display: inline-flex; align-items: center; gap: 8px; }
+.work-brief-dialog header button { padding: 5px; border-radius: 6px; color: #71717a; }
+.work-brief-dialog header button:hover { background: #f4f4f5; color: #18181b; }
+.work-brief-paper { padding: 20px 24px; font: 13.5px/1.75 "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; color: #27272a; }
+.work-brief-paper h2 { font-size: 17px; font-weight: 600; margin: 0 0 8px; color: #111827; }
+.work-brief-lead { color: #52525b; margin-bottom: 14px; }
+.work-brief-paper h3 { font-size: 13.5px; font-weight: 600; margin: 14px 0 3px; color: #18181b; }
+.work-brief-paper p { margin: 0; }
+.work-brief-dialog footer { padding: 12px 18px; border-top: 1px solid #eceef2; display: flex; justify-content: flex-end; }
+.work-brief-close-btn {
+  padding: 6px 14px !important;
+  border-radius: 7px;
+  background: #5e6ad2 !important;
+  color: #fff !important;
+  font-size: 12.5px !important;
+  font-weight: 500;
+}
+.work-brief-close-btn:hover { background: #4f5bc4 !important; }

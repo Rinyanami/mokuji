@@ -1,0 +1,220 @@
+/* Shared disguised popovers, assistant action bars & task context menus */
+.mk-model-popover {
+  position: absolute;
+  z-index: 40;
+  width: min(304px, calc(100vw - 24px));
+  border-radius: 12px;
+  padding: 6px;
+  font: 12.5px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  animation: mk-pop-in 120ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes mk-pop-in {
+  from { opacity: 0; transform: translateY(4px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.mk-place-above { bottom: calc(100% + 8px); }
+.mk-place-below { top: calc(100% + 8px); }
+.mk-align-right { right: 0; }
+.mk-align-left { left: 0; }
+
+.mk-pop-dark {
+  background: #242427;
+  color: #e4e4e7;
+  border: 1px solid #39393e;
+  color-scheme: dark;
+}
+.mk-pop-light {
+  background: #ffffff;
+  color: #18181b;
+  border: 1px solid #e4e4e7;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(15, 23, 42, 0.05);
+  color-scheme: light;
+}
+
+.mk-pop-section { padding: 4px; display: flex; flex-direction: column; gap: 4px; }
+.mk-pop-heading {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 8px 2px;
+  opacity: 0.56;
+  letter-spacing: 0.02em;
+}
+.mk-pop-models { display: flex; flex-direction: column; gap: 1px; }
+.mk-model-popover .mk-pop-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 9px;
+  border-radius: 7px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.mk-pop-dark.mk-model-popover .mk-pop-option:hover { background: #323236; }
+.mk-pop-light.mk-model-popover .mk-pop-option:hover { background: #f4f4f5; }
+.mk-pop-dark.mk-model-popover .mk-pop-option.active { background: rgba(94, 106, 210, 0.22); }
+.mk-pop-light.mk-model-popover .mk-pop-option.active { background: rgba(94, 106, 210, 0.1); }
+.mk-pop-option-main { display: inline-flex; align-items: center; gap: 5px; flex: 1; min-width: 0; }
+.mk-pop-option-main strong { font-weight: 550; font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mk-pop-option-main em {
+  font-style: normal;
+  font-size: 10px;
+  padding: 0 5px;
+  border-radius: 4px;
+  background: rgba(128, 128, 128, 0.18);
+  opacity: 0.85;
+}
+.mk-pop-option-sub { font-size: 11px; opacity: 0.58; white-space: nowrap; }
+.mk-pop-check { color: #5e6ad2; flex: none; }
+
+.mk-pop-divider {
+  height: 1px;
+  margin: 4px 6px;
+  background: rgba(128, 128, 128, 0.2);
+}
+
+.mk-pop-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+.mk-pop-row > span { opacity: 0.72; }
+.mk-model-popover .mk-pop-segment, .mk-model-popover .mk-pop-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px;
+  border-radius: 8px;
+  background: rgba(128, 128, 128, 0.16);
+}
+.mk-model-popover .mk-pop-segment button, .mk-model-popover .mk-pop-stepper button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 5px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 11.5px;
+  line-height: 1.4;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.mk-pop-dark.mk-model-popover .mk-pop-segment button[aria-pressed="true"] { background: #3b3b42; color: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.25); }
+.mk-pop-light.mk-model-popover .mk-pop-segment button[aria-pressed="true"] { background: #fff; color: #18181b; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); }
+.mk-model-popover .mk-pop-stepper span { min-width: 34px; text-align: center; font-size: 11px; font-variant-numeric: tabular-nums; }
+
+.mk-model-popover .mk-pop-footer {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  padding: 7px 10px;
+  border-radius: 7px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 12px;
+  opacity: 0.85;
+  cursor: pointer;
+}
+.mk-pop-dark.mk-model-popover .mk-pop-footer:hover { background: #323236; opacity: 1; }
+.mk-pop-light.mk-model-popover .mk-pop-footer:hover { background: #f4f4f5; opacity: 1; }
+
+/* Assistant Action Bar below chapter prose */
+.mk-assistant-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 18px 0 6px;
+  padding-top: 8px;
+  color: #8c8c96;
+  font-size: 12px;
+}
+.mk-actions-light { color: #71717a; }
+.mk-assistant-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+.mk-actions-dark button:hover:not(:disabled) { background: rgba(255, 255, 255, 0.08); color: #f4f4f5; }
+.mk-actions-light button:hover:not(:disabled) { background: rgba(0, 0, 0, 0.06); color: #18181b; }
+.mk-assistant-actions button.is-marked { color: #5e6ad2; }
+.mk-actions-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 6px;
+  font-size: 12px;
+  opacity: 0.78;
+  font-variant-numeric: tabular-nums;
+}
+.mk-actions-sep { opacity: 0.5; }
+
+/* Sidebar task hover ... popover */
+.mk-task-more-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+}
+.mk-task-more-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+*:hover > .mk-task-more-wrap .mk-task-more-btn,
+.mk-task-more-btn[aria-expanded="true"],
+.mk-task-more-btn:focus-visible {
+  opacity: 1;
+}
+.mk-task-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 35;
+  min-width: 148px;
+  padding: 4px;
+  border-radius: 8px;
+  background: #252529;
+  color: #ededef;
+  border: 1px solid #3c3c42;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.32);
+}
+.mk-task-more-wrap .mk-task-menu button {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 5px;
+  font-size: 12px;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.mk-task-more-wrap .mk-task-menu button:hover { background: rgba(255, 255, 255, 0.08); }
