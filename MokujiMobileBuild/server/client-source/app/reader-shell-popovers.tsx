@@ -11,6 +11,8 @@ export const simulatedModels: readonly {
   modelName: string;
   badge?: string;
 }[] = [
+  { appearance: 'notes', label: '手机备忘录', modelName: '系统备忘随记', badge: 'Mobile' },
+  { appearance: 'feishu', label: '飞书文档', modelName: 'Feishu 云文档', badge: 'Mobile' },
   { appearance: 'codex', label: 'Codex', modelName: 'GPT-6 Astra', badge: 'Max' },
   { appearance: 'workbuddy', label: 'WorkBuddy', modelName: 'DeepSeek-V4.1-Flash' },
   { appearance: 'doubao', label: '豆包', modelName: 'Doubao-Seed-2.0' },

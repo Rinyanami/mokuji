@@ -148,7 +148,7 @@ function ConversationShell(props: ReaderShellProps) {
     if (n !== chapter) onChapter(n);
   }
   function toggleRail() {
-    if (window.matchMedia('(max-width: 720px)').matches) setDrawer(open => !open);
+    if (window.matchMedia('(max-width: 768px), (max-height: 500px) and (pointer: coarse)').matches) setDrawer(open => !open);
     else setRail(open => !open);
   }
 
@@ -171,7 +171,7 @@ function ConversationShell(props: ReaderShellProps) {
   }, [drawer, pane, review, modelPopover]);
 
   useEffect(() => {
-    const media = window.matchMedia('(max-width: 720px)');
+    const media = window.matchMedia('(max-width: 768px), (max-height: 500px) and (pointer: coarse)');
     function resize() {
       if (!media.matches) setDrawer(false);
     }
@@ -245,14 +245,18 @@ function ConversationShell(props: ReaderShellProps) {
   const steps = (
     <ul className="ags-steps">
       <li>
-        <Check size={13} />
-        <span>已打开工作区</span>
-        <code><PeekText mask={bookTitle} real={props.realBookTitle || bookTitle} /></code>
+        <button type="button" className="ags-step-btn" onClick={props.onProjects} title="切换工作区 / 打开书架列表">
+          <Check size={13} />
+          <span>已打开工作区</span>
+          <code><PeekText mask={bookTitle} real={props.realBookTitle || bookTitle} /></code>
+        </button>
       </li>
       <li>
-        <Check size={13} />
-        <span>已读取文档</span>
-        <code><PeekText mask={filename} real={props.realChapterTitle || filename} /></code>
+        <button type="button" className="ags-step-btn" onClick={() => display('directory')} title="打开章节文件索引">
+          <Check size={13} />
+          <span>已读取文档</span>
+          <code><PeekText mask={filename} real={props.realChapterTitle || filename} /></code>
+        </button>
       </li>
       <li>
         <Check size={13} />
@@ -340,128 +344,141 @@ function ConversationShell(props: ReaderShellProps) {
       data-product={product}
       data-surface={surface}
     >
-      {!cloud && (
-        <>
-          {drawer && <button className="ags-scrim" aria-label="关闭侧栏" onClick={() => setDrawer(false)} />}
-          <aside className="ags-rail" aria-label={claude ? '会话侧栏' : '项目侧栏'}>
-            <div className="ags-rail-head">
-              {desktop && !claude ? (
-                <>
-                  <span className="ags-rail-app">Codex</span>
-                  <IconButton label="收起侧栏" onClick={toggleRail}>
-                    <PanelLeft size={16} />
-                  </IconButton>
-                </>
-              ) : (
-                <>
-                  <strong className="ags-wordmark">Claude</strong>
-                  <IconButton label="收起侧栏" onClick={toggleRail}>
-                    <PanelLeft size={17} />
-                  </IconButton>
-                </>
-              )}
+      <>
+        {drawer && <button className="ags-scrim" aria-label="关闭侧栏" onClick={() => setDrawer(false)} />}
+        <aside className="ags-rail" aria-label={claude ? '会话侧栏' : '项目侧栏'}>
+          <div className="ags-rail-head">
+            {desktop && !claude ? (
+              <>
+                <span className="ags-rail-app">Codex</span>
+                <IconButton label="收起侧栏" onClick={toggleRail}>
+                  <PanelLeft size={16} />
+                </IconButton>
+              </>
+            ) : claude ? (
+              <>
+                <strong className="ags-wordmark">Claude</strong>
+                <IconButton label="收起侧栏" onClick={toggleRail}>
+                  <PanelLeft size={17} />
+                </IconButton>
+              </>
+            ) : (
+              <>
+                <span className="ags-rail-app">Codex Cloud</span>
+                <IconButton label="收起侧栏" onClick={toggleRail}>
+                  <PanelLeft size={16} />
+                </IconButton>
+              </>
+            )}
+          </div>
+          <div className="ags-actions">
+            <button type="button" onClick={props.onImportFiles} title="导入本地书籍">
+              {claude ? <CirclePlus className="ags-plus" size={18} /> : <SquarePen size={17} />}
+              <span>{claude ? 'New chat' : '新会话'}</span>
+            </button>
+            {claude ? (
+              <>
+                <button type="button" onClick={props.onProjects} title="全部工作区 (Ctrl+K)">
+                  <Search size={17} />
+                  <span>Chats</span>
+                </button>
+                <button type="button" onClick={() => display('directory')} title="章节索引">
+                  <Folder size={17} />
+                  <span>Projects</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPane('reader');
+                    setReview(r => !r);
+                  }}
+                  title="目录与书签 Artifacts"
+                >
+                  <Boxes size={17} />
+                  <span>Artifacts</span>
+                </button>
+              </>
+            ) : (
+              <>
+                <button type="button" onClick={() => display('progress')} title="已记录的工作位置">
+                  <Clock3 size={17} />
+                  <span>自动化</span>
+                </button>
+                <button type="button" onClick={() => display('skills')} title="查看工作区工具">
+                  <Boxes size={17} />
+                  <span>技能</span>
+                </button>
+              </>
+            )}
+          </div>
+          <div className="ags-rail-scroll">
+            <div className="ags-group" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span>{claude ? 'Recents' : '线程'}</span>
+              <RevealToggle active={!!props.revealReal} onToggle={props.onToggleReveal} />
             </div>
-            <div className="ags-actions">
-              <button type="button" onClick={props.onImportFiles} title="导入本地书籍">
-                {claude ? <CirclePlus className="ags-plus" size={18} /> : <SquarePen size={17} />}
-                <span>{claude ? 'New chat' : '新会话'}</span>
+            {!claude && (
+              <button className="ags-folder" type="button" title={props.realBookTitle || bookTitle} onClick={() => display('directory')}>
+                <Folder size={15} />
+                <b><PeekText mask={bookTitle || '工作区'} real={props.realBookTitle} /></b>
+                <ChevronDown size={13} />
               </button>
-              {claude ? (
-                <>
-                  <button type="button" onClick={props.onProjects} title="全部工作区 (Ctrl+K)">
-                    <Search size={17} />
-                    <span>Chats</span>
-                  </button>
-                  <button type="button" onClick={() => display('directory')} title="章节索引">
-                    <Folder size={17} />
-                    <span>Projects</span>
-                  </button>
+            )}
+            <nav className="ags-recent" aria-label="最近会话">
+              {props.projects.map(project => (
+                <div
+                  key={project.id}
+                  className={'ags-project-row' + (project.current ? ' current' : '')}
+                >
                   <button
                     type="button"
+                    className="ags-row"
+                    title={project.realTitle || project.name}
+                    aria-current={project.current ? 'page' : undefined}
                     onClick={() => {
-                      setPane('reader');
-                      setReview(r => !r);
+                      setDrawer(false);
+                      props.onProject(project.id);
                     }}
-                    title="目录与书签 Artifacts"
                   >
-                    <Boxes size={17} />
-                    <span>Artifacts</span>
+                    <PeekText mask={project.name} real={project.realTitle} />
                   </button>
-                </>
-              ) : (
-                <>
-                  <button type="button" onClick={() => display('progress')} title="已记录的工作位置">
-                    <Clock3 size={17} />
-                    <span>自动化</span>
-                  </button>
-                  <button type="button" onClick={() => display('skills')} title="查看工作区工具">
-                    <Boxes size={17} />
-                    <span>技能</span>
-                  </button>
-                </>
-              )}
-            </div>
-            <div className="ags-rail-scroll">
-              <div className="ags-group" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span>{claude ? 'Recents' : '线程'}</span>
-                <RevealToggle active={!!props.revealReal} onToggle={props.onToggleReveal} />
-              </div>
-              {!claude && (
-                <button className="ags-folder" type="button" title={props.realBookTitle || bookTitle} onClick={() => display('directory')}>
-                  <Folder size={15} />
-                  <b><PeekText mask={bookTitle || '工作区'} real={props.realBookTitle} /></b>
-                  <ChevronDown size={13} />
-                </button>
-              )}
-              <nav className="ags-recent" aria-label="最近会话">
-                {props.projects.map(project => (
-                  <div
-                    key={project.id}
-                    className={'ags-project-row' + (project.current ? ' current' : '')}
-                  >
-                    <button
-                      type="button"
-                      className="ags-row"
-                      title={project.realTitle || project.name}
-                      aria-current={project.current ? 'page' : undefined}
-                      onClick={() => {
-                        setDrawer(false);
-                        props.onProject(project.id);
-                      }}
-                    >
-                      <PeekText mask={project.name} real={project.realTitle} />
-                    </button>
-                    <SidebarTaskActions
-                      projectId={project.id}
-                      onRename={props.onRenameProject}
-                      onManage={props.onProjects}
-                    />
-                  </div>
-                ))}
-              </nav>
-            </div>
-            <button type="button" className="ags-profile" onClick={onSettings} title="外观与阅读设置">
-              <span className="ags-avatar">M</span>
-              <span>
-                Mokuji
-                <small>{claude ? 'Pro plan' : '个人工作区'}</small>
-              </span>
-              <Settings2 size={15} />
-            </button>
-          </aside>
-        </>
-      )}
+                  <SidebarTaskActions
+                    projectId={project.id}
+                    onRename={props.onRenameProject}
+                    onManage={props.onProjects}
+                  />
+                </div>
+              ))}
+            </nav>
+          </div>
+          <button type="button" className="ags-profile" onClick={onSettings} title="外观与阅读设置">
+            <span className="ags-avatar">M</span>
+            <span>
+              Mokuji
+              <small>{claude ? 'Pro plan' : '个人工作区'}</small>
+            </span>
+            <Settings2 size={15} />
+          </button>
+        </aside>
+      </>
 
       <div className="ags-main">
         <header className="ags-top">
           {cloud ? (
             <>
-              <button type="button" className="ags-cloud-brand" onClick={props.onProjects}>
+              <button
+                type="button"
+                className="ags-toolbar-toggle ags-icon"
+                aria-label="切换侧栏"
+                onClick={toggleRail}
+              >
+                <PanelLeft size={18} />
+              </button>
+              <button type="button" className="ags-cloud-brand" onClick={props.onProjects} title="切换工作区 (Ctrl+K)">
                 <Terminal size={18} />
                 <span>Codex</span>
               </button>
               <span className="ags-divider">/</span>
-              <button type="button" className="ags-task-link" onClick={() => display('directory')}>
+              <button type="button" className="ags-task-link" onClick={() => display('directory')} title="打开章节索引">
                 Tasks
               </button>
               <ChevronRight className="ags-task-link" size={13} />
@@ -532,10 +549,10 @@ function ConversationShell(props: ReaderShellProps) {
           )}
 
           {!claude && desktop && (
-            <span className="ags-repo">
+            <button type="button" className="ags-repo" onClick={props.onProjects} title="切换工作区 (Ctrl+K)">
               <Folder size={13} />
-              {bookTitle}
-            </span>
+              <PeekText mask={bookTitle} real={props.realBookTitle} />
+            </button>
           )}
 
           <div className="ags-top-end">
@@ -594,22 +611,22 @@ function ConversationShell(props: ReaderShellProps) {
               <div className="ags-task-card">
                 <h1><PeekText mask={taskTitle} real={props.realChapterTitle || taskTitle} /></h1>
                 <div className="ags-env">
-                  <span>
+                  <button type="button" className="ags-env-btn" onClick={props.onProjects} title="切换书籍工作区">
                     <FolderGit2 size={13} />
                     <PeekText mask={bookTitle} real={props.realBookTitle || bookTitle} />
-                  </span>
+                  </button>
                   <i>·</i>
-                  <span>
+                  <button type="button" className="ags-env-btn" onClick={() => display('directory')} title="打开章节索引">
                     <GitBranch size={13} />
                     main
-                  </span>
+                  </button>
                   {paragraphCount > 0 && (
                     <>
                       <i>·</i>
-                      <span className="ags-status-pill">
+                      <button type="button" className="ags-env-btn ags-status-pill" onClick={() => props.onToggleSummary?.()} title="切换老板键工作摘要 (Space)">
                         <Check size={12} />
                         已完成
-                      </span>
+                      </button>
                     </>
                   )}
                 </div>
@@ -708,9 +725,9 @@ function ConversationShell(props: ReaderShellProps) {
                     />
                   )}
                 </div>
-                <span className="ags-place">
+                <button type="button" className="ags-place" onClick={() => display('directory')} title="打开章节目录">
                   {chapter + 1}/{chapters.length || '–'}
-                </span>
+                </button>
                 <button type="submit" className="ags-send" aria-label={query.trim() ? '查找资料' : '下一章'}>
                   {cloud ? (query.trim() ? 'Jump' : 'Next') : <ArrowUp size={17} />}
                 </button>

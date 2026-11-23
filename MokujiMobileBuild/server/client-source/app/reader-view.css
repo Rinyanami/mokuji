@@ -132,3 +132,23 @@ body.duji-workspace-active { overflow: hidden; }
   background: rgba(110, 123, 242, 0.22);
   color: #c7d2fe;
 }
+
+.mokuji-hl { border-radius: 3px; padding: 0 2px; color: inherit; cursor: pointer; }
+.mokuji-hl-yellow { background: rgba(250, 204, 21, 0.34); border-bottom: 2px solid #eab308; }
+.mokuji-hl-purple { background: rgba(139, 92, 246, 0.22); border-bottom: 2px solid #8b5cf6; }
+.mokuji-hl-green { background: rgba(16, 185, 129, 0.24); border-bottom: 2px solid #10b981; }
+
+.mokuji-sel-bar {
+  position: fixed; z-index: 45; left: 50%; bottom: calc(74px + env(safe-area-inset-bottom));
+  transform: translateX(-50%); display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  padding: 6px 10px; border-radius: 12px; background: #181a20; color: #f8fafc;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.32); border: 1px solid rgba(255, 255, 255, 0.14);
+  font-size: 12px; max-width: calc(100vw - 24px);
+}
+.mokuji-sel-dot { width: 18px; height: 18px; border-radius: 99px; border: 2px solid #fff3; cursor: pointer; }
+.mokuji-sel-dot.is-yellow { background: #eab308; }
+.mokuji-sel-dot.is-purple { background: #8b5cf6; }
+.mokuji-sel-dot.is-green { background: #10b981; }
+.mokuji-sel-bar button.mokuji-sel-btn { color: #e2e8f0; background: rgba(255,255,255,0.08); border-radius: 7px; padding: 4px 8px; font-size: 12px; }
+.mokuji-sel-bar button.mokuji-sel-btn:hover { background: rgba(255,255,255,0.16); color: #fff; }
+.mokuji-sel-bar input { min-width: 150px; background: #0f1116; color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 7px; padding: 4px 8px; font-size: 12px; }

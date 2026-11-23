@@ -1,5 +1,7 @@
 export const readerModes = [
   { value: 'normal', label: '正常阅读' },
+  { value: 'notes', label: '手机备忘录' },
+  { value: 'feishu', label: '飞书文档' },
   { value: 'codex', label: 'Codex' },
   { value: 'antigravity', label: 'Antigravity' },
   { value: 'doubao', label: '豆包' },
@@ -53,9 +55,13 @@ export function saveAppTheme(value: UiTheme) {
   if (typeof document !== 'undefined') {
     document.documentElement.dataset.theme = value;
   }
+  try {
+    (window as unknown as { MokujiNative?: { setSystemTheme?: (t: string) => void } }).MokujiNative?.setSystemTheme?.(value);
+  } catch {}
 }
 
 export function defaultShellTheme(product: ImmersiveProduct, surface: ReaderSurface): UiTheme {
+  if (product === 'notes' || product === 'feishu') return 'light';
   if (product === 'vscode') return 'dark';
   if (product === 'antigravity') return surface === 'desktop' ? 'dark' : 'light';
   if (product === 'codex') return 'dark';

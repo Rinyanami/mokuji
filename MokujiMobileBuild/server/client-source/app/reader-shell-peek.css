@@ -16,7 +16,7 @@
 }
 
 .mk-peek-real {
-  display: none;
+  display: none !important;
   color: #6366f1;
   font-weight: 500;
 }
@@ -26,7 +26,7 @@
 :is(button, a, .mk-peek-host):hover .mk-peek > .mk-peek-mask,
 :is(button, a, .mk-peek-host):focus-visible .mk-peek > .mk-peek-mask,
 .mk-reveal-all .mk-peek > .mk-peek-mask {
-  display: none;
+  display: none !important;
 }
 
 :is(button, a, .mk-peek-host):hover > .mk-peek > .mk-peek-real,
@@ -34,7 +34,7 @@
 :is(button, a, .mk-peek-host):hover .mk-peek > .mk-peek-real,
 :is(button, a, .mk-peek-host):focus-visible .mk-peek > .mk-peek-real,
 .mk-reveal-all .mk-peek > .mk-peek-real {
-  display: inline;
+  display: inline !important;
 }
 
 :is([data-theme="dark"], .ags-shell, .cx-local, .bd-buddy, .mk-editor:not([data-product="antigravity"][data-surface="web"])) .mk-peek-real {

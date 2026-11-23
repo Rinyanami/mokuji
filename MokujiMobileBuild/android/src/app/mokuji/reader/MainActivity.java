@@ -4,12 +4,17 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Insets;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Base64;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
@@ -21,6 +26,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,18 +46,65 @@ public final class MainActivity extends Activity {
     private static final int FILE_CHOOSER_REQ = 4102;
     private static final int EXPORT_FILE_REQ = 4103;
 
+    private FrameLayout rootContainer;
     private WebView webView;
     private ValueCallback<Uri[]> pendingUpload;
     private String pendingExportText;
 
+    private void applySystemTheme(boolean dark) {
+        int bg = dark ? Color.rgb(14, 16, 21) : Color.rgb(248, 249, 251);
+        if (rootContainer != null) rootContainer.setBackgroundColor(bg);
+        getWindow().setStatusBarColor(bg);
+        getWindow().setNavigationBarColor(bg);
+        if (Build.VERSION.SDK_INT >= 30) {
+            WindowInsetsController ctrl = getWindow().getInsetsController();
+            if (ctrl != null) {
+                int mask = WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+                    | WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
+                ctrl.setSystemBarsAppearance(dark ? 0 : mask, mask);
+            }
+        } else {
+            getWindow().getDecorView().setSystemUiVisibility(
+                dark ? 0 : (View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR)
+            );
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().setStatusBarColor(Color.rgb(247, 247, 242));
-        getWindow().setNavigationBarColor(Color.rgb(247, 247, 242));
-        getWindow().getDecorView().setSystemUiVisibility(
-            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-        );
+        if (Build.VERSION.SDK_INT >= 30) {
+            getWindow().setDecorFitsSystemWindows(false);
+        }
+        rootContainer = new FrameLayout(this);
+        rootContainer.setFitsSystemWindows(true);
+        rootContainer.setOnApplyWindowInsetsListener((v, insets) -> {
+            if (Build.VERSION.SDK_INT >= 30) {
+                Insets bars = insets.getInsets(WindowInsets.Type.systemBars() | WindowInsets.Type.displayCutout());
+                Insets ime = insets.getInsets(WindowInsets.Type.ime());
+                int top = bars.top;
+                if (top <= 0) {
+                    int resId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+                    if (resId > 0) top = getResources().getDimensionPixelSize(resId);
+                }
+                int bottom = Math.max(bars.bottom, ime.bottom);
+                v.setPadding(bars.left, top, bars.right, bottom);
+                return WindowInsets.CONSUMED;
+            }
+            int top = insets.getSystemWindowInsetTop();
+            if (top <= 0) {
+                int resId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+                if (resId > 0) top = getResources().getDimensionPixelSize(resId);
+            }
+            v.setPadding(
+                insets.getSystemWindowInsetLeft(),
+                top,
+                insets.getSystemWindowInsetRight(),
+                insets.getSystemWindowInsetBottom()
+            );
+            return insets.consumeSystemWindowInsets();
+        });
+        applySystemTheme(false);
 
         webView = new WebView(this);
         WebSettings ws = webView.getSettings();
@@ -118,7 +171,13 @@ public final class MainActivity extends Activity {
             }
         });
 
-        setContentView(webView);
+        rootContainer.addView(
+            webView,
+            new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        );
+        setContentView(rootContainer);
+        rootContainer.requestApplyInsets();
+        rootContainer.post(() -> rootContainer.requestApplyInsets());
         if (savedInstanceState != null) {
             webView.restoreState(savedInstanceState);
         } else {
@@ -234,14 +293,7 @@ public final class MainActivity extends Activity {
         @JavascriptInterface
         public void setSystemTheme(String theme) {
             boolean dark = "dark".equalsIgnoreCase(theme);
-            runOnUiThread(() -> {
-                int bg = dark ? Color.rgb(14, 16, 21) : Color.rgb(248, 249, 251);
-                getWindow().setStatusBarColor(bg);
-                getWindow().setNavigationBarColor(bg);
-                getWindow().getDecorView().setSystemUiVisibility(
-                    dark ? 0 : (View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR)
-                );
-            });
+            runOnUiThread(() -> applySystemTheme(dark));
         }
 
         @JavascriptInterface

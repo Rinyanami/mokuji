@@ -7,7 +7,7 @@
   display: none;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 900px), (max-height: 500px) and (pointer: coarse) {
   .mobile-only-flex {
     display: inline-flex;
   }
@@ -20,9 +20,16 @@
     display: none !important;
   }
 
-  /* On Profile page on mobile, keep sidebar cards (export/import backup) visible at bottom */
+  /* Prevent tablet/foldable/landscape orphaned sidebar columns */
+  .content-grid {
+    display: block !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  /* On Profile page on compact viewports, keep sidebar cards (export/import backup) stacked cleanly at bottom */
   .app-container.is-profile .sidebar {
     display: block !important;
+    width: 100% !important;
     margin-top: 14px;
   }
 
@@ -32,9 +39,14 @@
   .duji-app.reader-focused {
     padding-bottom: env(safe-area-inset-bottom);
   }
+  .duji-reader,
+  .mokuji-immersive {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
 
-  /* Compact Linear Mobile Top App Bar */
+  /* Compact Linear Mobile Top App Bar (notch & status-bar safe) */
   .site-header {
+    padding-top: env(safe-area-inset-top, 0px);
     border-bottom: 1px solid var(--line);
     background: rgba(248, 249, 251, 0.88);
     backdrop-filter: blur(18px);
@@ -206,6 +218,25 @@
   }
 
   /* Horizontal Single-Row Filter Rails on Shelf / Discover (No more multi-line chip walls!) */
+  .onboarding-steps {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    gap: 10px !important;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .onboarding-steps::-webkit-scrollbar {
+    display: none;
+  }
+  .onboarding-steps > button {
+    flex: 0 0 248px !important;
+    scroll-snap-align: start;
+  }
+  .collection-bar {
+    padding: 8px 14px !important;
+  }
   .catalog-toolbar,
   .collection-bar {
     display: flex !important;
@@ -217,6 +248,7 @@
     flex: 0 0 auto !important;
     white-space: nowrap !important;
     font-size: 11.5px !important;
+    min-width: 28px;
   }
   .filter-tags,
   .filter-bar,
@@ -502,13 +534,73 @@
     color: var(--coral-dark);
   }
 
+  /* Uniform Mobile Grid, Cards & Sources Rails */
+  .catalog-book-grid,
+  .home-book-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+  }
+  .reader-source-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+  .reader-row-actions {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    width: 100%;
+    gap: 8px !important;
+  }
+  .source-chips-bar {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    gap: 8px !important;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .source-chips-bar::-webkit-scrollbar {
+    display: none;
+  }
+  .source-chip {
+    flex: 0 0 auto !important;
+    white-space: nowrap !important;
+  }
+
   /* Normal Reader View Mobile Ergonomics */
   .duji-reader {
     margin: 0 !important;
-    padding: 10px 12px 18px !important;
+    padding: calc(10px + env(safe-area-inset-top, 0px)) 12px 18px !important;
+  }
+  .duji-reader-top {
+    gap: 8px;
+  }
+  .duji-reader-controls {
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .mokuji-reader-actions {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 6px;
+    scrollbar-width: none;
+  }
+  .mokuji-reader-actions::-webkit-scrollbar {
+    display: none;
+  }
+  .mokuji-reader-actions > button {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    font-size: 12px;
+    height: 32px;
+    padding: 0 10px;
   }
   .duji-reader .duji-reader-sheet {
-    height: calc(100dvh - 230px) !important;
+    height: calc(100dvh - 255px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important;
     border-radius: 12px !important;
   }
   .duji-reader .duji-reader-sheet article {
@@ -520,5 +612,28 @@
     flex: 1;
     justify-content: center;
     min-height: 40px;
+  }
+
+  @media (max-height: 500px) {
+    .header-inner {
+      height: 44px;
+      min-height: 44px;
+    }
+    .mobile-tabbar {
+      height: calc(48px + env(safe-area-inset-bottom));
+    }
+    .mobile-tab-item {
+      flex-direction: row;
+      gap: 6px;
+      min-height: 38px;
+      font-size: 11.5px;
+    }
+    .mobile-tab-icon {
+      width: 24px;
+      height: 20px;
+    }
+    .duji-reader .duji-reader-sheet {
+      height: calc(100dvh - 145px) !important;
+    }
   }
 }

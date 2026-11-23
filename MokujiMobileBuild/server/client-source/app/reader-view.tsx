@@ -9,12 +9,14 @@ import { ReaderMedia } from './reader-media';
 import {useReaderShortcuts} from './reader-shortcuts';
 import { ReaderRecordIndex, findReaderChapters } from './reader-record-index';
 import { useReaderBookmarks, type BookPoint } from './reader-bookmarks';
+import { useReaderHighlights, type HighlightColor, type TextHighlight } from './reader-highlights';
 import CotexSourceFont from './cotex-source-font';
 import { setTabAppearance, syncReaderAddress, workspaceFragment } from './work-route';
 import { ReaderLede, ReaderTail } from './reader-shell-lede';
 const AgentShell = lazy(() => import('./reader-shell-agents'));
 const BuddyShell = lazy(() => import('./reader-shell-buddy'));
 const EditorShell = lazy(() => import('./reader-shell-editor'));
+const MobileDocsShell = lazy(() => import('./reader-shell-mobile-docs'));
 import { projectAlias, showWorkEvent, taskAlias } from './reader-work-context';
 import { useWorkspaces } from './reader-workspaces';
 import ReaderWorkEvent from './reader-work-event';
@@ -71,7 +73,57 @@ function ReaderSession({id,onBack,onSwitchBook}:ReaderViewProps) {
   const [settingsOpen,setSettingsOpen] = useState(false);
   const [summaryOpen,setSummaryOpen] = useState(false);
   const [revealReal,setRevealReal] = useState(false);
-  const [index,setIndex] = useState<{tab:'search'|'marks';query:string}|null>(null);
+  const [index,setIndex] = useState<{tab:'search'|'marks'|'highlights';query:string}|null>(null);
+  const [selDraft,setSelDraft] = useState<{chapter:number;paragraph:number;quote:string}|null>(null);
+  const [activeHl,setActiveHl] = useState<TextHighlight|null>(null);
+  const [hlNoteMode,setHlNoteMode] = useState(false);
+  const [hlNoteDraft,setHlNoteDraft] = useState('');
+  const hl = useReaderHighlights(id);
+
+  function captureTextSelection() {
+    const sel = window.getSelection?.();
+    const quote = sel?.toString()?.trim() || '';
+    if (!quote || !sel || !sel.rangeCount) return;
+    let node: Node | null = sel.anchorNode;
+    while (node && node.nodeType !== 1) node = node.parentNode;
+    const pEl = (node as HTMLElement | null)?.closest?.('p[data-p]');
+    if (!pEl) return;
+    const pNum = Number(pEl.getAttribute('data-p'));
+    if (!Number.isInteger(pNum)) return;
+    setActiveHl(null);
+    setHlNoteMode(false);
+    setHlNoteDraft('');
+    setSelDraft({ chapter, paragraph: pNum, quote });
+  }
+
+  function renderParaText(text: string, pIndex: number) {
+    const list = hl.highlights.filter(h => h.chapter === chapter && h.paragraph === pIndex && h.quote);
+    if (!list.length) return text;
+    const parts: Array<string | { text: string; item: TextHighlight }> = [text];
+    for (const item of list) {
+      const nextParts: typeof parts = [];
+      for (const seg of parts) {
+        if (typeof seg !== 'string') { nextParts.push(seg); continue; }
+        const idx = seg.indexOf(item.quote);
+        if (idx < 0) { nextParts.push(seg); continue; }
+        if (idx > 0) nextParts.push(seg.slice(0, idx));
+        nextParts.push({ text: item.quote, item });
+        if (idx + item.quote.length < seg.length) nextParts.push(seg.slice(idx + item.quote.length));
+      }
+      parts.splice(0, parts.length, ...nextParts);
+    }
+    return parts.map((seg, idx) =>
+      typeof seg === 'string'
+        ? seg
+        : <mark key={`${seg.item.id}-${idx}`} className={`mokuji-hl mokuji-hl-${seg.item.color}`} title={seg.item.note ? `📝 ${seg.item.note}` : '点击编辑划线笔记'} onClick={e => {
+            e.stopPropagation();
+            setSelDraft(null);
+            setActiveHl(seg.item);
+            setHlNoteDraft(seg.item.note || '');
+            setHlNoteMode(true);
+          }}>{seg.text}</mark>
+    );
+  }
   useEffect(()=>{
     const onKey=(e:KeyboardEvent)=>{
       if(e.altKey && !e.ctrlKey && !e.metaKey && e.key.toLowerCase()==='v'){
@@ -432,11 +484,11 @@ function ReaderSession({id,onBack,onSwitchBook}:ReaderViewProps) {
     {workspace && !summaryOpen && loading && <p className="mokuji-work-status" role="status">正在载入工作区…</p>}
     {open && <div className={'duji-reader-sheet'+(workspace?' mokuji-shell-text':'')} ref={viewport} hidden={workspace && summaryOpen} inert={workspace && summaryOpen} tabIndex={0} role="region" aria-label={workspace?"工作记录正文":"章节正文"}
       onScroll={currentParagraph} onWheel={()=>{manual.current=true;}} onTouchStart={()=>{manual.current=true;}}
-      onPointerDown={()=>{manual.current=true;}} onKeyDown={event=>{if(['ArrowDown','ArrowUp','PageDown','PageUp','Home','End',' '].includes(event.key))manual.current=true;}}>
+      onPointerDown={()=>{manual.current=true;}} onMouseUp={captureTextSelection} onTouchEnd={()=>{setTimeout(captureTextSelection, 60);}} onKeyDown={event=>{if(['ArrowDown','ArrowUp','PageDown','PageUp','Home','End',' '].includes(event.key))manual.current=true;}}>
       <article style={{fontSize:size}}><CotexSourceFont fonts={open.text.sourceFonts} sourceUrl={open.text.sourceUrl}/>{workspace && <ReaderLede/>}
         {!workspace && <header className="duji-chapter-heading"><h2>{chapterTitle}</h2></header>}
         {open.text.paragraphs.map((text,i)=><Fragment key={chapter+':'+i}>{imagesByParagraph.has(i)&&<ReaderMedia bookId={id} chapter={chapter} group={imagesByParagraph.get(i)!} {...mediaState} remoteClosed={marks.collapsedImages.includes(chapter+':'+i)} media={open.text.media} workspace={workspace}/>}<div data-line={i+1} className={'duji-reader-paragraph'+(paragraph===i?' marked':'')}>
-          <p data-p={i}>{text}</p>
+          <p data-p={i}>{renderParaText(text, i)}</p>
           {!workspace && <button type="button" className="duji-reader-bookmark" aria-label={'记到第 '+(i+1)+' 段'} title={'记到第 '+(i+1)+' 段'}
             aria-pressed={marks.marks.some(point=>point.chapter===chapter&&point.paragraph===i)} disabled={!!conflict||marks.busy} onClick={()=>{
               manual.current=false;setParagraph(i);remember({chapter:open.text.n,paragraph:i});void flush().then(ok=>{if(ok)void marks.change({chapter:open.text.n,paragraph:i});});
@@ -451,12 +503,49 @@ function ReaderSession({id,onBack,onSwitchBook}:ReaderViewProps) {
   </>;
 
   const indexUI=<>
-    {index&&<ReaderRecordIndex bookId={id} chapters={chapters} marks={marks.marks} current={{chapter,paragraph}} workspace={workspace} tab={index.tab} initialQuery={index.query} busy={marks.busy} loading={disabled}
-      onGo={goToPoint} onClose={()=>setIndex(null)} onRemove={p=>void marks.change(p,'remove')} onMark={()=>{if(open)void marks.change({chapter,paragraph});}} onSaveNote={marks.setNote}/>}
+    {index&&<ReaderRecordIndex bookId={id} chapters={chapters} marks={marks.marks} highlights={hl.highlights} current={{chapter,paragraph}} workspace={workspace} tab={index.tab} initialQuery={index.query} busy={marks.busy} loading={disabled}
+      onGo={goToPoint} onClose={()=>setIndex(null)} onRemove={p=>void marks.change(p,'remove')} onMark={()=>{if(open)void marks.change({chapter,paragraph});}} onSaveNote={marks.setNote} onUpdateHighlightNote={hl.updateHighlightNote} onRemoveHighlight={hl.removeHighlight}/>}
+    {(selDraft || activeHl) && <div className="mokuji-sel-bar" role="dialog" aria-label="划线笔记工具条">
+      {selDraft && !hlNoteMode && <>
+        {(['yellow','purple','green'] as HighlightColor[]).map(c=><button key={c} type="button" className={`mokuji-sel-dot is-${c}`} aria-label={`划线(${c})`} onClick={()=>{
+          hl.addHighlight({ ...selDraft, color: c });
+          setCopyNote('已添加划线高亮');
+          setSelDraft(null);
+          window.getSelection?.()?.removeAllRanges();
+        }}/>)}
+        <button type="button" className="mokuji-sel-btn" onClick={()=>setHlNoteMode(true)}>记笔记</button>
+        <button type="button" className="mokuji-sel-btn" onClick={()=>{
+          void navigator.clipboard?.writeText(selDraft.quote).catch(()=>{});
+          setCopyNote('已复制选中片段');
+          setSelDraft(null);
+        }}>复制</button>
+      </>}
+      {hlNoteMode && (selDraft || activeHl) && <form style={{display:'flex',alignItems:'center',gap:6}} onSubmit={e=>{
+        e.preventDefault();
+        if (activeHl) {
+          hl.updateHighlightNote(activeHl.id, hlNoteDraft);
+          setCopyNote('已更新划线笔记');
+          setActiveHl(null);
+        } else if (selDraft) {
+          hl.addHighlight({ ...selDraft, color: 'yellow', note: hlNoteDraft });
+          setCopyNote('已保存划线与笔记');
+          setSelDraft(null);
+          window.getSelection?.()?.removeAllRanges();
+        }
+        setHlNoteMode(false);
+        setHlNoteDraft('');
+      }}>
+        <input value={hlNoteDraft} onChange={e=>setHlNoteDraft(e.target.value)} placeholder="写下划线笔记…" autoFocus/>
+        <button type="submit" className="mokuji-sel-btn" style={{background:'#5e6ad2',color:'#fff'}}>保存</button>
+        {activeHl && <button type="button" className="mokuji-sel-btn" onClick={()=>{hl.removeHighlight(activeHl.id);setActiveHl(null);setHlNoteMode(false);setCopyNote('已删除划线');}}>删除</button>}
+      </form>}
+      <button type="button" className="mokuji-sel-btn" aria-label="关闭划线条" onClick={()=>{setSelDraft(null);setActiveHl(null);setHlNoteMode(false);}}>✕</button>
+    </div>}
     {marks.message&&<div className="mokuji-mark-toast" role="status">{marks.message}</div>}
   </>;
   const indexActions=<div className="mokuji-reader-actions"><button type="button" className="button button-outline" disabled={!detail} onClick={()=>{setSettingsOpen(false);setIndex({tab:'search',query:''});}}>搜索章节</button>
     <button type="button" className="button button-outline" disabled={!detail} onClick={()=>{setSettingsOpen(false);setIndex({tab:'marks',query:''});}}>我的书签</button>
+    <button type="button" className="button button-outline" disabled={!detail} onClick={()=>{setSettingsOpen(false);setIndex({tab:'highlights',query:''});}}>划线笔记 ({hl.highlights.length})</button>
     <button type="button" className="button button-outline" disabled={!open||disabled||marks.busy} onClick={()=>void marks.change({chapter,paragraph})}>切换当前位置书签</button></div>;
   function changeShellTheme(value: UiTheme) {
     setShellTheme(value);
@@ -488,8 +577,9 @@ function ReaderSession({id,onBack,onSwitchBook}:ReaderViewProps) {
     {navigation}
   </section>;
 
-  const Shell=appearance==='codex'||appearance==='claude'?AgentShell:
-    appearance==='antigravity'||appearance==='vscode'?EditorShell:BuddyShell;
+  const Shell=(appearance==='notes'||appearance==='feishu')?MobileDocsShell:
+    (appearance==='codex'||appearance==='claude')?AgentShell:
+    (appearance==='antigravity'||appearance==='vscode')?EditorShell:BuddyShell;
   return <section className={'mokuji-immersive' + (revealReal && !summaryOpen ? ' mk-reveal-all' : '')} data-work-hints={workHints.enabled?'on':'off'} data-appearance={appearance} data-surface={surface} data-shell-theme={shellTheme} aria-label={modeLabel}
     onDragOver={event=>{if(event.dataTransfer.types.includes('Files'))event.preventDefault();}}
     onDrop={event=>{if(event.dataTransfer.files.length){event.preventDefault();void workspaces.importFiles(Array.from(event.dataTransfer.files));}}}>

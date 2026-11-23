@@ -63,7 +63,7 @@ function DotPet() {
 }
 
 export default function CotexShell(p: ReaderShellProps) {
-  const [rail, setRail] = useState(() => window.innerWidth > 720);
+  const [rail, setRail] = useState(() => !window.matchMedia('(max-width: 768px), (max-height: 500px) and (pointer: coarse)').matches);
   useSidebarShortcut(() => setRail(value => !value));
   const [panel, setPanel] = useState<Panel>(null);
   const [menu, setMenu] = useState<Menu>(null);
@@ -94,7 +94,7 @@ export default function CotexShell(p: ReaderShellProps) {
   const hintsEnabled = p.workHints?.enabled ?? true;
 
   useEffect(() => {
-    const media = window.matchMedia('(max-width: 720px)');
+    const media = window.matchMedia('(max-width: 768px), (max-height: 500px) and (pointer: coarse)');
     const change = () => setRail(!media.matches);
     media.addEventListener('change', change);
     return () => media.removeEventListener('change', change);
@@ -211,7 +211,9 @@ export default function CotexShell(p: ReaderShellProps) {
   const lead = (
     <div className="cx-lede">
       <div className="cx-user-bubble">
-        <span>{p.chapterTitle}</span>
+        <button type="button" onClick={() => show('files')} title="打开章节文件目录" style={{ textAlign: 'inherit', font: 'inherit', color: 'inherit' }}>
+          <span>{p.chapterTitle}</span>
+        </button>
       </div>
       <button
         type="button"
@@ -226,12 +228,12 @@ export default function CotexShell(p: ReaderShellProps) {
         {closed || p.summaryOpen ? <ChevronRight size={14} /> : <ChevronDown size={14} />}
       </button>
       {hintsEnabled && (
-        <div className="cx-check">
+        <button type="button" className="cx-check" onClick={() => show('files')} title="打开章节目录">
           <Wifi size={15} />
           <span>
             {closed ? '已完成资料核对' : `正在核对资料 ${p.chapter + 1}/${p.chapters.length}`}
           </span>
-        </div>
+        </button>
       )}
       {closed && (
         <div className="cx-collapsed">

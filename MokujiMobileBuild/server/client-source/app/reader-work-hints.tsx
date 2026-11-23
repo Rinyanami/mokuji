@@ -4,7 +4,7 @@ export type WorkHints={enabled:boolean;frequency:number};
 const storageKey='mokuji.reader.workHints.v1';
 export const defaultWorkHints:WorkHints={enabled:true,frequency:5};
 export function supportsWorkHints(product:ImmersiveProduct,surface:ReaderSurface){
-  return product!=='vscode' && !(product==='antigravity'&&surface==='desktop');
+  return product!=='vscode' && product!=='notes' && product!=='feishu' && !(product==='antigravity'&&surface==='desktop');
 }
 export function readWorkHints():WorkHints {
   try{

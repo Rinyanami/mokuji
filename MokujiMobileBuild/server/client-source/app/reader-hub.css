@@ -39,18 +39,6 @@
 .reader-platform-buttons { display: flex; gap: 8px; flex-wrap: wrap; margin: 9px 0; }
 .reader-focused .site-header, .reader-focused .local-notice, .reader-focused .site-footer, .reader-focused .top-accent { display: none; }
 .reader-focused .app-container { max-width: none; width: 100%; padding: 0; }
-@media(max-width:640px) {
-  .reader-hub { margin: 18px auto; }
-  .reader-source-section, .reader-import, .reader-detail-prompt { padding: 14px; }
-  .reader-row-actions .button { padding: 8px 10px; min-height: 36px; }
-  .reader-hub-head { align-items: flex-start; flex-direction: column; }
-  .reader-hub-head > .button { flex-shrink: 0; }
-  .reader-book-icon { display: none; }
-  .reader-shelf-links, .reader-hub .form-row { flex-wrap: wrap; }
-  .reader-detail-prompt .button { min-height: 38px; }
-  .local-notice { font-size: 11px; }
-  .reader-import-actions { justify-content: flex-start; }
-}
 
 .reader-resume {
   display: flex; align-items: center; justify-content: space-between; gap: 14px;
@@ -80,13 +68,7 @@
 .reader-group-meta { white-space: nowrap; font-size: 12px; }
 .reader-show-more { margin: 12px 0 0; }
 .reader-txt-location { margin: 8px 0 12px; color: var(--muted); font-size: 12px; }
-@media(max-width:560px) {
-  .reader-resume { padding: 14px; }
-  .reader-resume strong { font-size: 16px; }
-  .reader-filter-fields { grid-template-columns: minmax(0, 1fr); gap: 8px; }
-  .reader-origin-filter select { height: 38px; }
-}
-.reader-import-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.reader-import-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; flex-shrink: 0; }
 .reader-import-actions .button { white-space: nowrap; }
 .reader-layout-options { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: 14px 0 8px; }
 .reader-appearance-choice { max-width: 100%; align-self: center; gap: 10px; }
@@ -94,7 +76,6 @@
 .reader-surface-picker button { border: 0; border-radius: 6px; background: transparent; color: var(--muted); font-size: 12.5px; font-weight: 500; padding: 4px 11px; min-height: 28px; }
 .reader-surface-picker button[aria-pressed=true] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgba(15, 23, 42, 0.1); }
 .reader-appearance-choice select { height: 34px; }
-@media(max-width:640px) { .reader-appearance-choice { flex-basis: 100%; } }
 .reader-original-title { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
 .reader-edition { display: inline-block; vertical-align: middle; margin-left: 7px; padding: 1px 6px; border: 1px solid var(--line-strong); border-radius: 4px; color: var(--ink-secondary); font-size: 11px; }
 .reader-browse-tabs { display: flex; gap: 4px; margin: 16px 0; border-bottom: 1px solid var(--line); }
@@ -112,5 +93,29 @@
 .reader-row-actions a.fiction-official { font-size: 12.5px; text-decoration: none; }
 .fiction-intro { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.65; }
 .fiction-pages { justify-content: center; border-top: 1px solid var(--line); padding-top: 12px; font-size: 13px; }
-@media(max-width:640px) { .brand-word .brand-latin { display: none; } .web-fiction { padding: 14px; } .web-fiction .reader-row-actions { flex-shrink: 0; } }
-@media(max-width:430px) { .fiction-filters { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .fiction-filters .reader-origin-filter { gap: 3px; padding: 0 6px; } }
+
+@media(max-width:768px), (max-height:500px) and (pointer:coarse) {
+  .reader-hub { margin: 10px auto 18px; }
+  .reader-source-section, .reader-import, .reader-detail-prompt { padding: 14px; }
+  .reader-hub-head { align-items: stretch; flex-direction: column; gap: 10px; }
+  .reader-import-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; justify-content: stretch; gap: 8px; }
+  .reader-import-actions .button { width: 100%; justify-content: center; padding: 0 10px; font-size: 12.5px; }
+  .reader-layout-options { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; }
+  .reader-appearance-choice { grid-column: 1 / -1; width: 100%; }
+  .reader-source-row { flex-direction: column; align-items: stretch; gap: 10px; }
+  .reader-book-icon { display: none; }
+  .reader-row-actions { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: flex-start; width: 100%; gap: 8px; }
+  .reader-row-actions .button { padding: 7px 12px; min-height: 36px; flex: 1 1 auto; justify-content: center; }
+  .reader-shelf-links, .reader-hub .form-row { flex-wrap: wrap; }
+  .reader-detail-prompt .button { min-height: 38px; }
+  .local-notice { font-size: 11px; }
+  .reader-filter-fields { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .reader-resume { flex-direction: column; align-items: stretch; padding: 14px; gap: 10px; }
+  .reader-resume strong { font-size: 16px; }
+  .reader-resume > .button { width: 100%; justify-content: center; }
+  .brand-word .brand-latin { display: none; }
+  .web-fiction { padding: 14px; }
+  .web-fiction .reader-row-actions { flex-shrink: 0; }
+  .fiction-filters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .fiction-filters .reader-origin-filter { flex: initial; width: 100%; gap: 4px; padding: 0 8px; }
+}

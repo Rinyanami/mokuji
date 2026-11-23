@@ -114,7 +114,7 @@
 .cx-wide .cx-sidebar,.cx-wide .cx-strip{display:none}
 @media(max-width:1150px){.cx-sidebar{width:227px}}
 @media(max-width:850px){.cx-sidebar{width:205px}.cx-strip{width:44px}.cx-compose-wrap{padding:9px 14px 13px}}
-@media(max-width:720px){
+@media(max-width:768px), (max-height:500px) and (pointer:coarse){
   .cx-bar{height:36px;padding-bottom:0;gap:2px}.cx-menubar{margin-left:2px;gap:1px}.cx-menubar>button{font-size:12px;padding:4px 5px}
   .cx-window>.cx-tool{width:27px}.cx-window>.cx-tool:first-child{display:none}
   .cx-strip{width:38px;gap:6px}.cx-strip>.cx-tool,.cx-strip-pop-anchor>.cx-tool{width:30px;height:30px}.cx-strip>.cx-tool>svg,.cx-strip-pop-anchor>.cx-tool>svg{width:16px;height:16px}

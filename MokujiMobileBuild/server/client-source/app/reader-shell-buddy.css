@@ -171,7 +171,7 @@
 .bd-results button svg {margin-left:auto;color:#5e6ad2}
 .bd-mark-now {border:1px solid var(--bd-line)!important;margin-bottom:6px;color:#5e6ad2!important}
 .bd-reader .bd-settings {display:flex;align-items:center;gap:8px;padding:8px;font-size:13px;border-top:1px solid var(--bd-line);border-radius:0}
-@media(max-width:760px) {
+@media(max-width:768px), (max-height:500px) and (pointer:coarse) {
   .bd-reader .bd-side {position:absolute;left:0;top:0;bottom:0;z-index:15;width:min(255px,85vw);box-shadow:6px 0 24px #0003}
   .bd-reader.bd-desktop .bd-side {top:30px}
   .bd-doubao.bd-desktop .bd-side {top:39px}

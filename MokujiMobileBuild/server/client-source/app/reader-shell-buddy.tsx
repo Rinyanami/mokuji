@@ -71,7 +71,9 @@ function Intro({
     return (
       <div className="bd-intro">
         <div className="bd-question">
-          <span>帮我整理「{p.chapterTitle}」的内容记录</span>
+          <button type="button" onClick={openContents} title="点击打开章节与书签目录" style={{ textAlign: 'inherit', font: 'inherit', color: 'inherit' }}>
+            {p.chapterTitle}
+          </button>
         </div>
         <div className="bd-identity">
           <AssistantMark buddy={false} />
@@ -89,9 +91,9 @@ function Intro({
             <ChevronDown size={13} />
           </button>
           {hintsEnabled && (
-            <div className="bd-think-quote">
+            <button type="button" className="bd-think-quote" onClick={openContents} title="打开章节目录与索引" style={{ textAlign: 'left', width: '100%' }}>
               已按当前目录索引定位至第 {p.chapter + 1} / {p.chapters.length} 项记录，正在核对上下文并输出正文。
-            </div>
+            </button>
           )}
         </div>
       </div>
@@ -101,7 +103,9 @@ function Intro({
   return (
     <div className="bd-intro">
       <div className="bd-question">
-        <span>{p.chapterTitle}</span>
+        <button type="button" onClick={openContents} title="点击打开章节与书签目录" style={{ textAlign: 'inherit', font: 'inherit', color: 'inherit' }}>
+          {p.chapterTitle}
+        </button>
       </div>
       <div className="bd-identity">
         <AssistantMark buddy />
@@ -133,7 +137,7 @@ export function BuddyDoubaoShell(p: ReaderShellProps) {
   useSidebarShortcut(toggleRail);
   const buddy = p.product === 'workbuddy';
   const desktop = p.surface === 'desktop';
-  const [compact, setCompact] = useState(() => window.matchMedia('(max-width: 760px)').matches);
+  const [compact, setCompact] = useState(() => window.matchMedia('(max-width: 768px), (max-height: 500px) and (pointer: coarse)').matches);
   const [sidebar, setSidebar] = useState(true);
   const [drawer, setDrawer] = useState(false);
   const [contents, setContents] = useState(false);
@@ -176,7 +180,7 @@ export function BuddyDoubaoShell(p: ReaderShellProps) {
   }, [p.chapters, p.chapter]);
 
   useEffect(() => {
-    const mq = window.matchMedia('(max-width: 760px)');
+    const mq = window.matchMedia('(max-width: 768px), (max-height: 500px) and (pointer: coarse)');
     const update = () => {
       setCompact(mq.matches);
       setDrawer(false);

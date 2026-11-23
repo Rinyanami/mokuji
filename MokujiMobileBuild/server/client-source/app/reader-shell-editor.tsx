@@ -170,14 +170,18 @@ export default function EditorShell(props: ReaderShellProps) {
   return <EditorWorkbench key={props.product + '-' + props.surface} {...props} />;
 }
 
+const compactViewportQuery = '(max-width: 768px), (max-height: 500px) and (pointer: coarse)';
+const isCompactEditorViewport = () => window.matchMedia(compactViewportQuery).matches;
+
 function EditorWorkbench(props: ReaderShellProps) {
   const { product, surface, chapter, chapters, paragraph, disabled, children, onChapter, onBack, onSettings } =
     props;
   const gravity = product === 'antigravity';
   const [manager, setManager] = useState(gravity && surface === 'web');
-  const [sidebar, setSidebar] = useState(() => window.matchMedia('(min-width: 761px)').matches);
+  const [sidebar, setSidebar] = useState(() => !isCompactEditorViewport());
+  const [docsOpen, setDocsOpen] = useState(true);
   const [activity, setActivity] = useState<ActivityView>('explorer');
-  const [aux, setAux] = useState(() => window.matchMedia('(min-width: 1040px)').matches);
+  const [aux, setAux] = useState(() => window.matchMedia('(min-width: 1040px) and (min-height: 501px)').matches);
   const [query, setQuery] = useState('');
   const [agentPrompt, setAgentPrompt] = useState('');
   const [termCmd, setTermCmd] = useState('');
@@ -206,7 +210,7 @@ function EditorWorkbench(props: ReaderShellProps) {
 
   function navigate(n: number) {
     onChapter(n);
-    if (!window.matchMedia('(min-width: 761px)').matches) setSidebar(false);
+    if (isCompactEditorViewport()) setSidebar(false);
   }
   function openView(view: ActivityView) {
     if (sidebar && activity === view && view !== 'search') {
@@ -217,7 +221,7 @@ function EditorWorkbench(props: ReaderShellProps) {
     setSidebar(true);
     setExpanded(true);
     setMenu('');
-    if (!window.matchMedia('(min-width: 761px)').matches) setAux(false);
+    if (isCompactEditorViewport()) setAux(false);
     if (view === 'search') requestAnimationFrame(() => input.current?.focus());
   }
   function find() {
@@ -237,7 +241,7 @@ function EditorWorkbench(props: ReaderShellProps) {
       if (event.key === 'Escape') {
         setMenu('');
         setModelPop(false);
-        if (!window.matchMedia('(min-width: 761px)').matches) {
+        if (isCompactEditorViewport()) {
           setSidebar(false);
           setAux(false);
         }
@@ -256,12 +260,12 @@ function EditorWorkbench(props: ReaderShellProps) {
 
   const toggleSidebar = () => {
     setSidebar(!sidebar);
-    if (!sidebar && !window.matchMedia('(min-width: 761px)').matches) setAux(false);
+    if (!sidebar && isCompactEditorViewport()) setAux(false);
   };
   useSidebarShortcut(toggleSidebar);
   const toggleAux = () => {
     setAux(!aux);
-    if (!aux && !window.matchMedia('(min-width: 761px)').matches) setSidebar(false);
+    if (!aux && isCompactEditorViewport()) setSidebar(false);
   };
 
   function submitAgentPrompt(e?: FormEvent) {
@@ -573,6 +577,17 @@ function EditorWorkbench(props: ReaderShellProps) {
       </header>
 
       <div className="mke-work">
+        {(sidebar || aux) && isCompactEditorViewport() && (
+          <button
+            type="button"
+            className="mke-scrim"
+            aria-label="关闭侧栏"
+            onClick={() => {
+              setSidebar(false);
+              setAux(false);
+            }}
+          />
+        )}
         {!manager && (
           <div className="mke-activity" aria-label="活动栏">
             <button
@@ -822,12 +837,17 @@ function EditorWorkbench(props: ReaderShellProps) {
                 {searchBox}
                 {expanded && (
                   <>
-                    <div className="mke-dir">
-                      <ChevronDown />
+                    <button
+                      type="button"
+                      className="mke-dir"
+                      aria-expanded={docsOpen}
+                      onClick={() => setDocsOpen(v => !v)}
+                    >
+                      {docsOpen ? <ChevronDown /> : <ChevronRight />}
                       <FolderOpen />
                       docs
-                    </div>
-                    {tree}
+                    </button>
+                    {docsOpen && tree}
                   </>
                 )}
                 <div className="mke-fill" />
@@ -931,23 +951,40 @@ function EditorWorkbench(props: ReaderShellProps) {
                 </button>
               </div>
               <div className="mke-crumb">
-                <button type="button" title="Go to File…" onClick={find}>
+                <button type="button" title="Open Explorer" onClick={() => openView('explorer')}>
                   docs
                 </button>
                 <ChevronRight />
                 {multiRelease && (
                   <>
-                    <span>{releaseFolder(chapter)}</span>
+                    <button type="button" title="Browse Volume / Folder" onClick={() => openView('explorer')}>
+                      {releaseFolder(chapter)}
+                    </button>
                     <ChevronRight />
                   </>
                 )}
-                <span className="mke-md">
-                  <ArrowDown />
-                </span>
-                <span>{name}</span>
+                <button
+                  type="button"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
+                  title={`Switch Chapter · ${props.realChapterTitle || name}`}
+                  onClick={find}
+                >
+                  <span className="mke-md">
+                    <ArrowDown />
+                  </span>
+                  {name}
+                </button>
                 <ChevronRight />
-                <span>#</span>
-                <span>{documentFor(chapter)[1]}</span>
+                <button
+                  type="button"
+                  title="打开全书索引 / 搜正文"
+                  onClick={() => {
+                    if (props.onFindRecord) props.onFindRecord('');
+                    else find();
+                  }}
+                >
+                  # {documentFor(chapter)[1]}
+                </button>
               </div>
             </>
           )}

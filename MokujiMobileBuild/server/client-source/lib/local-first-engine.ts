@@ -939,20 +939,51 @@ async function handleLocalApi(urlStr: string, init?: RequestInit): Promise<Respo
     return jsonResponse({ book, chapters } satisfies BookDetail);
   }
 
+  async function hydrateStoredChapter(ch: StoredChapter): Promise<StoredChapter> {
+    if (!ch.sourceUrl) return ch;
+    if (ch.sourceUrl.startsWith('mangadex-ch://')) {
+      if (ch.images?.length) return ch;
+      const chId = ch.sourceUrl.slice('mangadex-ch://'.length);
+      const res = await crossPlatformHttp(`https://api.mangadex.org/at-home/server/${encodeURIComponent(chId)}`, 'GET', {}, '', nativeFetchRef || undefined);
+      if (res.ok && res.body) {
+        try {
+          const j = JSON.parse(res.body) as { baseUrl?: string; chapter?: { hash?: string; data?: string[]; dataSaver?: string[] } };
+          const files = j.chapter?.data?.length ? j.chapter.data : (j.chapter?.dataSaver || []);
+          const mode = j.chapter?.data?.length ? 'data' : 'data-saver';
+          if (j.baseUrl && j.chapter?.hash && files.length) {
+            const media: Record<string, string> = {};
+            const items = files.map((file, idx) => {
+              const asset = `md_${idx}`;
+              media[asset] = `${j.baseUrl}/${mode}/${j.chapter!.hash}/${file}`;
+              return { asset, alt: `第 ${idx + 1} 页` };
+            });
+            return { ...ch, paragraphs: [], images: [{ paragraph: 0, items }], media };
+          }
+        } catch {}
+      }
+      return ch;
+    }
+    if ((!ch.paragraphs || ch.paragraphs.length === 0) && !ch.images?.length) {
+      const res = await crossPlatformHttp(ch.sourceUrl, 'GET', {}, '', nativeFetchRef || undefined);
+      if (res.ok && res.body) {
+        const parsed = htmlToParagraphs(res.body);
+        if (parsed.paragraphs.length > 0) return { ...ch, paragraphs: parsed.paragraphs };
+      }
+    }
+    return ch;
+  }
+
   if (path === '/api/reader/chapter') {
     const id = url.searchParams.get('id') || '';
     const n = Number(url.searchParams.get('n') || '0');
     const idx = await ensureReaderBooks();
     const book = idx.books.find(b => b.id === id);
     let ch = await kvGet<StoredChapter>(`chap:${id}:${n}`);
-    if (book && ch && ch.sourceUrl && (!ch.paragraphs || ch.paragraphs.length === 0) && !ch.images?.length) {
-      const res = await crossPlatformHttp(ch.sourceUrl, 'GET', {}, '', nativeFetchRef || undefined);
-      if (res.ok && res.body) {
-        const parsed = htmlToParagraphs(res.body);
-        if (parsed.paragraphs.length > 0) {
-          ch = { ...ch, paragraphs: parsed.paragraphs };
-          await kvSet(`chap:${id}:${n}`, ch);
-        }
+    if (book && ch) {
+      const updated = await hydrateStoredChapter(ch);
+      if (updated !== ch) {
+        ch = updated;
+        await kvSet(`chap:${id}:${n}`, ch);
       }
     }
     if (!book || !ch) return jsonResponse({ error: '该章节尚未离线缓存，请联网嗅探或重新导入本地文件。' }, 404);
@@ -1204,6 +1235,117 @@ async function handleLocalApi(urlStr: string, init?: RequestInit): Promise<Respo
         } else if (res.error) errors.push({ sourceId: 'mangadex', sourceName: 'MangaDex', error: res.error });
       }
       return jsonResponse({ results, errors });
+    }
+    if (path === '/api/reader/sources/add' && method === 'POST') {
+      const body = typeof init?.body === 'string'
+        ? JSON.parse(init.body) as { sourceId?: string; remoteId?: string; workId?: string; title?: string; author?: string; detailUrl?: string; category?: '网文' | '轻小说' | '文学' | '漫画' }
+        : {};
+      const sourceId = (body.sourceId || '').trim();
+      const remoteId = (body.remoteId || '').trim();
+      const idx = await ensureReaderBooks();
+      let bookId = `${sourceId || 'custom'}:${remoteId || Date.now().toString(36)}`;
+      let finalTitle = (body.title || '').trim() || '在线连载作品';
+      let finalAuthor = (body.author || '').trim() || sourceId;
+      let category: '网文' | '轻小说' | '文学' | '漫画' = body.category || (sourceId === 'mangadex' ? '漫画' : '轻小说');
+      const chapters: StoredChapter[] = [];
+      let sourceUrl = body.detailUrl || '';
+
+      if (sourceId === 'syosetu' && remoteId) {
+        sourceUrl = `https://ncode.syosetu.com/${remoteId}/`;
+        const res = await crossPlatformHttp(sourceUrl, 'GET', {}, '', nativeFetchRef || undefined);
+        if (!res.ok || !res.body) return jsonResponse({ error: res.error || `无法拉取目录（HTTP ${res.status}）` }, 502);
+        const doc = new DOMParser().parseFromString(res.body, 'text/html');
+        const h1 = doc.querySelector('.novel_title, .p-novel__title, h1')?.textContent?.trim();
+        if (h1 && !body.title) finalTitle = h1;
+        doc.querySelectorAll('a[href]').forEach(a => {
+          const href = a.getAttribute('href') || '';
+          const txt = (a.textContent || '').trim();
+          if (new RegExp(`^/${remoteId}/\\d+/?$`, 'i').test(href) && txt) {
+            chapters.push({ title: txt, paragraphs: [], sourceUrl: `https://ncode.syosetu.com${href}` });
+          }
+        });
+        if (!chapters.length) return jsonResponse({ error: '未解析到 Syosetu 章节目录（可能是短篇单章，请用智能嗅探抓取）' }, 404);
+        chapters[0] = await hydrateStoredChapter(chapters[0]);
+      } else if (sourceId === 'mangadex' && remoteId) {
+        category = '漫画';
+        sourceUrl = `https://mangadex.org/title/${remoteId}`;
+        const feedUrl = `https://api.mangadex.org/manga/${encodeURIComponent(remoteId)}/feed?limit=100&order[chapter]=asc&translatedLanguage[]=zh&translatedLanguage[]=zh-hk&translatedLanguage[]=en`;
+        let res = await crossPlatformHttp(feedUrl, 'GET', {}, '', nativeFetchRef || undefined);
+        let items: Array<{ id: string; attributes?: { chapter?: string; title?: string } }> = [];
+        if (res.ok && res.body) {
+          try { items = (JSON.parse(res.body) as { data?: typeof items }).data || []; } catch {}
+        }
+        if (!items.length) {
+          res = await crossPlatformHttp(`https://api.mangadex.org/manga/${encodeURIComponent(remoteId)}/feed?limit=100&order[chapter]=asc`, 'GET', {}, '', nativeFetchRef || undefined);
+          if (res.ok && res.body) {
+            try { items = (JSON.parse(res.body) as { data?: typeof items }).data || []; } catch {}
+          }
+        }
+        if (!items.length) return jsonResponse({ error: '该 MangaDex 作品暂无可读章节或被屏蔽' }, 404);
+        for (let i = 0; i < items.length; i++) {
+          const attr = items[i].attributes || {};
+          const label = [attr.chapter ? `第 ${attr.chapter} 话` : `第 ${i + 1} 话`, attr.title || ''].filter(Boolean).join(' · ');
+          chapters.push({ title: label, paragraphs: [], sourceUrl: `mangadex-ch://${items[i].id}` });
+        }
+        chapters[0] = await hydrateStoredChapter(chapters[0]);
+      } else if (body.detailUrl) {
+        return handleLocalApi('/api/reader/sniff', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: body.detailUrl, mode: 'save', title: finalTitle, author: finalAuthor, category, workId: body.workId }),
+        });
+      } else {
+        return jsonResponse({ error: '缺少有效的书源或作品链接' }, 400);
+      }
+
+      for (let i = 0; i < chapters.length; i++) await kvSet(`chap:${bookId}:${i}`, chapters[i]);
+      const rb: ReaderBook = {
+        id: bookId,
+        title: finalTitle,
+        author: finalAuthor,
+        source: sourceId || 'online',
+        category,
+        unit: category === '漫画' ? '话' : '章',
+        sourceType: 'online',
+        sourceUrl,
+        chapterCount: chapters.length,
+        available: true,
+        progress: { chapter: 0, paragraph: 0, revision: 1, updatedAt: new Date().toISOString() },
+      };
+      idx.books = [rb, ...idx.books.filter(b => b.id !== bookId)];
+      idx.bindings[body.workId || bookId] = bookId;
+      await kvSet('readerBooks', idx);
+      scheduleAutoSync();
+      return jsonResponse({ book: rb });
+    }
+    if (path === '/api/reader/sources/cache' && method === 'POST') {
+      const body = typeof init?.body === 'string' ? JSON.parse(init.body) as { id?: string; start?: number; count?: number } : {};
+      const id = body.id || '';
+      const idx = await ensureReaderBooks();
+      const book = idx.books.find(b => b.id === id);
+      if (!book) return jsonResponse({ error: '未找到书籍' }, 404);
+      const start = Math.max(0, Number(body.start ?? 0));
+      const count = Math.min(30, Math.max(1, Number(body.count ?? 20)));
+      let cached = 0;
+      let errors = 0;
+      for (let i = start; i < Math.min(book.chapterCount, start + count); i++) {
+        const cur = await kvGet<StoredChapter>(`chap:${id}:${i}`);
+        if (!cur) continue;
+        if ((cur.paragraphs && cur.paragraphs.length > 0) || cur.images?.length) continue;
+        const next = await hydrateStoredChapter(cur);
+        if ((next.paragraphs && next.paragraphs.length > 0) || next.images?.length) {
+          await kvSet(`chap:${id}:${i}`, next);
+          cached++;
+        } else errors++;
+      }
+      scheduleAutoSync();
+      return jsonResponse({ ok: true, cached, errors });
+    }
+    if (path === '/api/reader/sources/refresh' && method === 'POST') {
+      const body = typeof init?.body === 'string' ? JSON.parse(init.body) as { id?: string } : {};
+      const idx = await ensureReaderBooks();
+      const book = idx.books.find(b => b.id === (body.id || ''));
+      return jsonResponse({ chapterCount: book?.chapterCount || 0 });
     }
     return jsonResponse({ sources: [...builtins, ...custom], templates: [] });
   }

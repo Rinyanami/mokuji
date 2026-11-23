@@ -1,7 +1,8 @@
 import {useEffect,useMemo,useRef,useState} from 'react';
-import {Bookmark,FileSearch,PenLine,Search,X} from 'lucide-react';
+import {Bookmark,FileSearch,Highlighter,PenLine,Search,X} from 'lucide-react';
 import {readerRequest,type ChapterInfo,type ChapterText} from './reading-client';
 import type {BookPoint,SavedPoint} from './reader-bookmarks';
+import type {TextHighlight} from './reader-highlights';
 import {taskAlias} from './reader-work-context';
 import './reader-interaction.css';
 
@@ -31,17 +32,19 @@ export function findReaderChapters(chapters:readonly ChapterInfo[],query:string)
 
 type TextMatch={chapter:number;chapterTitle:string;paragraph:number;snippet:string};
 
-export function ReaderRecordIndex({bookId,chapters,marks,current,workspace,busy,loading,tab,initialQuery,onClose,onGo,onRemove,onMark,onSaveNote}:{
-  bookId?:string;chapters:readonly ChapterInfo[];marks:SavedPoint[];current:BookPoint;workspace:boolean;busy:boolean;loading:boolean;
-  tab:'search'|'marks';initialQuery:string;onClose:()=>void;onGo:(p:BookPoint)=>void;onRemove:(p:BookPoint)=>void;onMark:()=>void;onSaveNote?:(p:BookPoint,note:string)=>void;
+export function ReaderRecordIndex({bookId,chapters,marks,highlights=[],current,workspace,busy,loading,tab,initialQuery,onClose,onGo,onRemove,onMark,onSaveNote,onUpdateHighlightNote,onRemoveHighlight}:{
+  bookId?:string;chapters:readonly ChapterInfo[];marks:SavedPoint[];highlights?:TextHighlight[];current:BookPoint;workspace:boolean;busy:boolean;loading:boolean;
+  tab:'search'|'marks'|'highlights';initialQuery:string;onClose:()=>void;onGo:(p:BookPoint)=>void;onRemove:(p:BookPoint)=>void;onMark:()=>void;onSaveNote?:(p:BookPoint,note:string)=>void;onUpdateHighlightNote?:(id:string,note:string)=>void;onRemoveHighlight?:(id:string)=>void;
 }){
-  const [view,setView]=useState<'search'|'fulltext'|'marks'>(tab),[query,setQuery]=useState(initialQuery),[limit,setLimit]=useState(100);
+  const [view,setView]=useState<'search'|'fulltext'|'marks'|'highlights'>(tab),[query,setQuery]=useState(initialQuery),[limit,setLimit]=useState(100);
   const [fullQuery,setFullQuery]=useState('');
   const [fullHits,setFullHits]=useState<TextMatch[]>([]);
   const [fullSearching,setFullSearching]=useState(false);
   const [fullNote,setFullNote]=useState('');
   const [editingNoteKey,setEditingNoteKey]=useState('');
   const [noteDraft,setNoteDraft]=useState('');
+  const [editingHlId,setEditingHlId]=useState('');
+  const [hlNoteDraft,setHlNoteDraft]=useState('');
   const dialog=useRef<HTMLDialogElement>(null), field=useRef<HTMLInputElement>(null);
   useEffect(()=>{const el=dialog.current,prior=document.activeElement as HTMLElement|null;el?.showModal();if(tab==='search')field.current?.focus();
     return ()=>{el?.close();if(prior?.isConnected)prior.focus({preventScroll:true});};},[tab]);
@@ -93,7 +96,8 @@ export function ReaderRecordIndex({bookId,chapters,marks,current,workspace,busy,
     <header><strong>{workspace?'工作区索引':'阅读索引'}</strong><button type="button" aria-label="关闭索引" onClick={onClose}><X size={18}/></button></header>
     <section className="mokuji-index-tabs"><button type="button" aria-pressed={view==='search'} onClick={()=>{setView('search');requestAnimationFrame(()=>field.current?.focus());}}><Search size={14}/>{workspace?'搜目录':'搜章节'}</button>
       {bookId&&<button type="button" aria-pressed={view==='fulltext'} onClick={()=>setView('fulltext')}><FileSearch size={14}/>搜全书正文</button>}
-      <button type="button" aria-pressed={view==='marks'} onClick={()=>setView('marks')}><Bookmark size={14}/>{workspace?'已标记':'书签/批注'} ({marks.length})</button></section>
+      <button type="button" aria-pressed={view==='marks'} onClick={()=>setView('marks')}><Bookmark size={14}/>{workspace?'已标记':'书签/批注'} ({marks.length})</button>
+      <button type="button" aria-pressed={view==='highlights'} onClick={()=>setView('highlights')}><Highlighter size={14}/>划线笔记 ({highlights.length})</button></section>
     {view==='search'&&<>
       <input ref={field} type="search" value={query} aria-label={workspace?'搜索工作记录':'按章节名或序号搜索'} placeholder={workspace?'输入名称或编号':'输入章名、中文章号或序号'} onChange={e=>{setQuery(e.target.value);setLimit(100);}} onKeyDown={e=>{if(e.key==='Enter'&&!e.nativeEvent.isComposing&&hits.length===1&&!loading)onGo({chapter:hits[0].n,paragraph:0});}}/>
       <div className="mokuji-index-list">{hits.slice(0,limit).map(c=><button type="button" key={c.n} disabled={loading} aria-current={c.n===current.chapter?'page':undefined} onClick={()=>onGo({chapter:c.n,paragraph:0})}><span>{c.n+1}</span>{title(c)}</button>)}
@@ -126,5 +130,25 @@ export function ReaderRecordIndex({bookId,chapters,marks,current,workspace,busy,
           </form>}
         </div>;})}
         {!marks.length&&<p>还没有标记，在阅读时点书签即可添加与批注。</p>}</div></>}
+    {view==='highlights'&&<div className="mokuji-index-list">
+      {highlights.map(h=>{const c=chapters.find(x=>x.n===h.chapter);const chLabel=c?title(c):`第 ${h.chapter+1} 章`;const isEd=editingHlId===h.id;
+        return <div key={h.id} style={{borderBottom:'1px solid #f1f5f9',padding:'8px 4px'}}>
+          <div style={{display:'flex',alignItems:'center',gap:6}}>
+            <button type="button" style={{flex:1,textAlign:'left',justifyContent:'flex-start',gap:6}} onClick={()=>onGo({chapter:h.chapter,paragraph:h.paragraph})}>
+              <span style={{width:8,height:8,borderRadius:99,background:h.color==='purple'?'#8b5cf6':h.color==='green'?'#10b981':'#eab308',flex:'none'}}/>
+              <small style={{color:'#4b56bf',fontWeight:600}}>{chLabel} · 第 {h.paragraph+1} 段</small>
+            </button>
+            {onUpdateHighlightNote&&<button type="button" aria-label="编辑划线笔记" onClick={()=>{setEditingHlId(isEd?'':h.id);setHlNoteDraft(h.note);}}><PenLine size={14}/></button>}
+            {onRemoveHighlight&&<button type="button" aria-label="删除划线" onClick={()=>onRemoveHighlight(h.id)}><X size={15}/></button>}
+          </div>
+          <p style={{margin:'4px 6px',fontSize:12.5,color:'#1f2937',borderLeft:'3px solid #eab308',paddingLeft:8,lineHeight:1.5}}>「{h.quote}」</p>
+          {h.note&&!isEd&&<p style={{margin:'4px 6px',fontSize:12,color:'#4b56bf',background:'#f4f5f8',padding:'5px 8px',borderRadius:6}}>📝 {h.note}</p>}
+          {isEd&&<form style={{display:'flex',gap:6,margin:'6px'}} onSubmit={e=>{e.preventDefault();onUpdateHighlightNote?.(h.id,hlNoteDraft);setEditingHlId('');}}>
+            <input value={hlNoteDraft} onChange={e=>setHlNoteDraft(e.target.value)} placeholder="写下这条划线的感悟或笔记…" autoFocus/>
+            <button type="submit" style={{flex:'none',background:'#5e6ad2',color:'#fff',padding:'0 10px',borderRadius:7}}>保存</button>
+          </form>}
+        </div>;})}
+      {!highlights.length&&<p>还没有划线笔记，在正文中选中文字即可高亮并记录想法。</p>}
+    </div>}
   </dialog>;
 }

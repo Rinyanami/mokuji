@@ -100,15 +100,19 @@
 .mk-editor .mke-ext-item.is-active > span { background: var(--ed-accent); color: #fff; }
 .mk-editor .mke-main, .mk-editor .mke-body { display: flex; flex-direction: column; flex: 1; min-height: 0; min-width: 0; overflow: hidden; }
 .mk-editor .mke-tabs { display: flex; align-items: center; background: var(--ed-panel); border-bottom: 1px solid var(--ed-line); padding-right: 6px; height: 35px; flex: none; }
-.mk-editor .mke-tab-strip { display: flex; align-items: stretch; height: 100%; overflow: auto; scrollbar-width: none; }
+.mk-editor .mke-tab-strip { flex: 1; min-width: 0; display: flex; align-items: stretch; height: 100%; overflow: auto; scrollbar-width: none; }
+.mk-editor .mke-tab-strip::-webkit-scrollbar { display: none; }
 .mk-editor .mke-tab, .mk-editor .mke-active-tab { height: 100%; display: flex; align-items: center; border-right: 1px solid var(--ed-line); font-size: 12.5px; color: var(--ed-dim); }
 .mk-editor .mke-active-tab { color: var(--ed-fg); background: var(--ed-bg); box-shadow: inset 0 1.5px var(--ed-accent); }
 .mk-editor .mke-tab-btn { height: 100%; padding: 0 10px; border-radius: 0; white-space: nowrap; }
 .mk-editor .mke-tab-close { padding: 3px; margin-right: 4px; }
 .mk-editor .mke-tab-close svg { width: 13px; height: 13px; }
 .mk-editor .mke-btn-on { color: var(--ed-accent) !important; }
-.mk-editor .mke-crumb { display: flex; flex: none; align-items: center; gap: 4px; min-width: 0; white-space: nowrap; overflow: hidden; height: 24px; color: var(--ed-dim); padding: 0 14px; font-size: 12px; }
-.mk-editor .mke-crumb > svg { width: 12px; }
+.mk-editor .mke-crumb { display: flex; flex: none; align-items: center; gap: 4px; min-width: 0; white-space: nowrap; overflow: auto; scrollbar-width: none; height: 24px; color: var(--ed-dim); padding: 0 14px; font-size: 12px; }
+.mk-editor .mke-crumb button { color: inherit; font: inherit; padding: 1px 4px; border-radius: 4px; flex: none; }
+.mk-editor .mke-crumb button:hover { color: var(--ed-fg); background: var(--ed-hover); }
+.mk-editor .mke-crumb > svg { width: 12px; flex: none; }
+.mk-editor .mke-scrim { display: none; }
 .mk-editor .mke-body .mokuji-shell-text { flex: 1; min-height: 0; height: auto; background: var(--ed-bg); color: var(--ed-fg); border: 0; border-radius: 0; scrollbar-width: thin; scrollbar-color: #525252 transparent; }
 .mk-editor:not(.mk-manager) .mke-body .mokuji-shell-text article { counter-reset: editor-line; max-width: none; padding: 6px 8px 28px; margin: 0; font-family: Consolas, 'Cascadia Mono', 'Microsoft YaHei UI', monospace; line-height: 1.62; }
 .mk-editor:not(.mk-manager) .mke-body .duji-reader-paragraph { counter-increment: editor-line; display: grid; grid-template-columns: 4ch minmax(0, 1fr) 24px; gap: 14px; margin: 0; padding: 2px 4px; background: transparent; border: 0; }
@@ -185,8 +189,9 @@
 .mk-manager .mke-overview-row { justify-content: flex-start; gap: 9px; border-radius: 6px; padding: 7px; width: 100%; }
 .mk-manager .mke-overview-row svg:last-child:not(:first-child) { margin-left: auto; }
 .mk-manager .mke-overview-info { padding: 8px 8px 0; font-size: 11px; color: var(--ed-dim); }
-@media(max-width: 760px) {
+@media(max-width: 768px), (max-height: 500px) and (pointer: coarse) {
   .mk-editor .mke-title { gap: 4px; padding: 0 4px; }
+  .mk-editor .mke-scrim { display: block; position: absolute; inset: 0; z-index: 5; background: rgba(0, 0, 0, 0.36); }
   .mk-editor .mke-command { width: auto; padding: 0 8px; }
   .mk-editor .mke-command kbd { display: none; }
   .mk-editor .mke-center { justify-content: flex-start; }
@@ -198,8 +203,12 @@
   .mk-editor .mke-activity > button { height: 42px; }
   .mk-editor .mke-activity > button svg { width: 19px; height: 19px; }
   .mk-editor .mke-side, .mk-editor .mke-aux { position: absolute; z-index: 6; top: 0; bottom: 0; width: min(265px, calc(100% - 54px)); box-shadow: 3px 3px 14px #0004; }
+  .mk-editor .mke-scrim { position: absolute; z-index: 5; inset: 0; background: rgba(0, 0, 0, .38); border-radius: 0; padding: 0; }
   .mk-editor .mke-side { left: 38px; }
   .mk-editor .mke-aux { right: 0; }
+  .mk-editor .mke-crumb { overflow-x: auto; scrollbar-width: none; }
+  .mk-editor .mke-crumb::-webkit-scrollbar { display: none; }
+  .mk-editor .mke-crumb > button { flex: 0 0 auto; white-space: nowrap; font-size: 11.5px; }
   .mk-manager .mke-side { left: 0; }
   .mk-editor .mke-file { height: 32px; }
   .mk-editor .mke-status { gap: 4px; }

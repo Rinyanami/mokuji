@@ -139,16 +139,20 @@
 .ags-worked[open] summary svg {transform:rotate(90deg)}
 .ags-steps {list-style:none;padding:5px 0 0;margin:0;font:12px/1.55 "Segoe UI",sans-serif;color:var(--ags-sub)}
 .ags-steps li {display:flex;align-items:center;gap:7px;padding:4px 0;flex-wrap:wrap}
-.ags-steps li svg {color:#63816c}
+.ags-steps li .ags-step-btn {display:inline-flex;align-items:center;gap:7px;padding:2px 6px;margin-left:-6px;border-radius:6px;text-align:left;max-width:100%}
+.ags-steps li .ags-step-btn:hover {background:var(--ags-hover);color:var(--ags-text)}
+.ags-steps li svg {color:#63816c;flex-shrink:0}
 .ags-steps li code {overflow-wrap:anywhere;font-size:11px}
 .ags-summary-bar {display:flex;align-items:center;justify-content:space-between}
 .ags-summary-label {font-size:14px;font-weight:650}
 .ags-summary-boss {font-size:12px;color:var(--ags-sub);padding:3px 8px;border-radius:6px;border:1px solid var(--ags-line)}
 .ags-task-card {padding:13px clamp(16px,4vw,40px) 0;border-bottom:1px solid var(--ags-line);background:#252525}
 .ags-task-card h1 {font:600 19px/1.3 "Segoe UI",sans-serif;letter-spacing:-.3px;margin:0 0 6px;color:var(--ags-text);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-.ags-env,.ags-env span,.ags-task-card nav,.ags-review-tabs,.ags-diff-head,.ags-review-title {display:flex;align-items:center}
-.ags-env {gap:7px;color:var(--ags-sub);font-size:12px;flex-wrap:wrap}
-.ags-env span {min-width:0;gap:4px;white-space:nowrap;max-width:56%;overflow:hidden}
+.ags-env,.ags-env span,.ags-env .ags-env-btn,.ags-task-card nav,.ags-review-tabs,.ags-diff-head,.ags-review-title {display:flex;align-items:center}
+.ags-env {gap:6px;color:var(--ags-sub);font-size:12px;flex-wrap:wrap}
+.ags-env > span,.ags-env > .ags-env-btn {min-width:0;gap:4px;white-space:nowrap;max-width:100%;overflow:hidden;padding:2px 6px;border-radius:6px}
+.ags-env > .ags-env-btn:first-child {max-width:52vw}
+.ags-env .ags-env-btn:hover {background:var(--ags-hover);color:var(--ags-text)}
 .ags-status-pill {color:#4ade80;font-weight:500}
 .ags-env i {font-style:normal}
 .ags-task-card nav {gap:15px;margin-top:8px}
@@ -189,19 +193,21 @@
 .ags-artifact-row[aria-current="page"] {background:#ebe8df;font-weight:550}
 .ags-artifact-add {display:flex;align-items:center;gap:7px;padding:8px 10px;margin-bottom:8px;border-radius:8px;border:1px solid var(--ags-line)!important;font-size:12.5px;color:#a75b43}
 @media(max-width:1049px){.ags-shell .ags-review {display:block;position:absolute;z-index:4;inset:44px 0 0;width:auto;max-width:100%;border-left:0;overflow:auto;padding:8px 15px 24px}.ags-cloud .ags-review{inset:52px 0 0}}
-@media(max-width:720px){
+@media(max-width:768px), (max-height:500px) and (pointer:coarse){
   .ags-shell .ags-rail {display:none}
   .ags-shell.ags-drawer-open .ags-rail {display:flex;position:absolute;top:0;bottom:0;left:0;width:min(290px,83vw);z-index:6;padding-top:max(10px,env(safe-area-inset-top))}
   .ags-shell button.ags-scrim {display:block;position:absolute;inset:0;z-index:5;background:#15151555}
   .ags-shell button.ags-toolbar-toggle,.ags-shell:not(.ags-rail-off) .ags-toolbar-toggle {display:flex}
   .ags-history {display:none}
-  .ags-shell .ags-top {padding:0 7px;min-height:45px;gap:3px}
+  .ags-shell .ags-top {padding:0 5px;min-height:45px;gap:2px}
   .ags-shell .ags-pane {top:45px}
-  .ags-top-end {gap:0}.ags-top-end .ags-icon {width:31px;min-width:31px}
+  .ags-top-end {gap:0;flex-shrink:0}.ags-top-end .ags-icon {width:27px;min-width:27px}.ags-top-end .mk-reveal-btn {padding:2px 4px}
+  .ags-cloud .ags-cloud-brand {font-size:13px;gap:4px;padding:3px 4px}
+  .ags-cloud .ags-task-link {font-size:12px;padding:3px 2px}
   .ags-segments button {padding:4px 9px}.ags-segments {left:47%}
   .ags-shell .ags-thread-title {max-width:calc(100% - 110px)}
-  .ags-cloud .ags-task-link,.ags-cloud .ags-divider,.ags-repo {display:none}
-  .ags-shell .duji-reader-sheet.mokuji-shell-text>article {padding:12px 15px 25px}
+  .ags-repo {display:none}
+  .ags-shell .duji-reader-sheet.mokuji-shell-text>article {padding:12px 15px 92px}
   .ags-shell .ags-composer {width:calc(100% - 20px);margin-top:4px;padding:7px 9px 5px;margin-bottom:max(6px,env(safe-area-inset-bottom))}
   .ags-query input,.ags-composer>input {font-size:15px}
 }

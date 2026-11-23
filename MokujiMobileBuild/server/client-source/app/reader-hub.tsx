@@ -26,7 +26,7 @@ const message=(reason:unknown)=> reason instanceof Error ? reason.message : '暂
 const pageSize=6;
 function sourceInfo(item:ReaderBook) {
   const online=item.sourceType==='online' || item.sourceType==='custom';
-  const name=sourceLabel(item.source || (item.sourceType==='custom'?'自定义书源':online?'在线书源':item.sourceType==='upload'?'TXT 导入':'Cotex'));
+  const name=sourceLabel(item.source || (item.sourceType==='custom'?'自定义书源':online?'在线书源':item.sourceType==='upload'?'TXT 导入':'本地书库'));
   return {key:(online?'online:':'local:')+name,name,online};
 }
 
@@ -210,12 +210,13 @@ export default function ReaderHub({work,shelf,onRead,onBack,onJump,onAdd,browse,
   }
   return <main className="reader-hub">
     {work && <button type="button" className="text-button reader-return" onClick={onBack}><ChevronLeft size={14}/>返回作品详情</button>}
-    <div className="reader-hub-head"><div><h1>{work ? work.title : '阅读'}</h1><p>{work ? '选择、全网搜索或粘贴网页链接嗅探，将此书与正文绑定。' : '管理本机可读作品、导入 TXT / EPUB / CBZ 漫画包，或一键进入摸鱼工作区。'}</p></div>
+    <div className="reader-hub-head"><div><h1>{work ? work.title : browse==='sources' ? '找书与嗅探' : browse==='fiction' ? '中文网文' : '阅读书库'}</h1><p>{work ? '选择、全网搜索或粘贴网页链接嗅探，将此书与正文绑定。' : browse==='sources' ? '全网多源检索小说与漫画，或粘贴任意网页目录 / 直链一键嗅探入库。' : '管理本机可读作品、导入 TXT / EPUB / CBZ 漫画包，或切换工作区摸鱼界面。'}</p></div>
       <div className="reader-import-actions">
         <button type="button" className="button button-outline" disabled={busy} onClick={()=>setImportPanel(importPanel==='txt'?null:'txt')} aria-expanded={importPanel==='txt'}><Upload size={15}/>导入 TXT / EPUB / CBZ</button>
+        {!work && <a className="button button-outline" href="#/workspace">进入工作区<ArrowRight size={14}/></a>}
       </div></div>
-    <div className="reader-layout-options">
-        {!work&&<a className="button button-outline" href="#/workspace">进入工作区<ArrowRight size={14}/></a>}
+    {(work || browse!=='sources') && <>
+      <div className="reader-layout-options">
         <label className="reader-origin-filter reader-appearance-choice">
           <span>站内阅读界面</span>
           <select value={appearance} onChange={event=>{
@@ -237,8 +238,9 @@ export default function ReaderHub({work,shelf,onRead,onBack,onJump,onAdd,browse,
           {(['light','dark'] as const).map(value=><button type="button" key={value} aria-pressed={shellTheme===value}
             onClick={()=>{saveShellTheme(value);setShellTheme(value);}}>{value==='light'?'浅色':'深色'}</button>)}
         </div>}
-    </div>
-    {importPanel===null && <p className="reader-txt-location">{storageNotice}</p>}
+      </div>
+      {importPanel===null && <p className="reader-txt-location">{storageNotice}</p>}
+    </>}
     {importPanel==='wiki' && <form className="reader-import" onSubmit={importWiki}>
       <label className="field-label">中文维基文库链接<input type="url" inputMode="url" value={wikiUrl} required disabled={busy}
         placeholder="https://zh.wikisource.org/wiki/…" aria-describedby="wiki-import-help"
@@ -249,7 +251,7 @@ export default function ReaderHub({work,shelf,onRead,onBack,onJump,onAdd,browse,
     </form>}
     {!work && browse==='library' && latest && !filter && !selectedSource && <section className="reader-resume" aria-label="继续阅读">
       <div><h2>继续阅读</h2><strong>{latest.title}</strong><p>{[latest.author,sourceInfo(latest).name,readingPosition(latest.progress)].filter(Boolean).join(' · ')}</p></div>
-      <button className="button button-sage" type="button" onClick={()=>onRead(latest.id)}>接着读<ArrowRight size={14}/></button>
+      <div style={{display:'flex',gap:8,flexShrink:0}}><a className="button button-outline" href="#/workspace">工作区</a><button className="button button-sage" type="button" onClick={()=>onRead(latest.id)}>接着读<ArrowRight size={14}/></button></div>
     </section>}
     {importPanel==='txt' && <form className="reader-import" onSubmit={importFile}><h2><FileText size={16}/>导入 TXT / EPUB / CBZ 漫画</h2>
       <label className="field-label">本地文件<input type="file" accept={readerFileAccept} required disabled={busy} onChange={event=>{const next=event.target.files?.[0]||null;setFile(next);setTitle(work?.title || (next && !/\.(?:epub|cbz|zip)$/i.test(next.name) ? next.name.replace(/\.te?xt$/i,'') : next?.name.replace(/\.(?:epub|cbz|zip)$/i,'')||''));setAuthor(work?.author || '');}}/></label>
@@ -267,9 +269,15 @@ export default function ReaderHub({work,shelf,onRead,onBack,onJump,onAdd,browse,
     {work && !!suggested.length && <section className="reader-source-section"><h2>同名的正文来源</h2>{suggested.map(card)}</section>}
     {work && !showAll && <div style={{display:'flex',flexWrap:'wrap',gap:8}}><button type="button" className="button button-outline" onClick={()=>setShowAll(true)}><Search size={14}/>从已有书源选择</button>{browse!=='sources' && <button type="button" className="button button-sage" onClick={()=>onBrowse('sources')}><Globe size={14}/>去全网书源搜索 / 网页嗅探</button>}</div>}
     {!work && <nav className="reader-browse-tabs" aria-label="选择阅读书库">
-      <button type="button" aria-pressed={browse==='library'} onClick={()=>onBrowse('library')}>正文书库</button>
-      <button type="button" aria-pressed={browse==='sources'} onClick={()=>onBrowse('sources')}><Globe size={13} style={{marginRight:4,verticalAlign:'-2px'}}/>书源与嗅探</button>
-      <button type="button" aria-pressed={browse==='fiction'} onClick={()=>onBrowse('fiction')}>中文网文</button>
+      {(browse==='sources' || browse==='fiction') ? <>
+        <button type="button" aria-pressed={browse==='sources'} onClick={()=>onBrowse('sources')}><Globe size={13} style={{marginRight:4,verticalAlign:'-2px'}}/>书源与嗅探</button>
+        <button type="button" aria-pressed={browse==='fiction'} onClick={()=>onBrowse('fiction')}>开源中文网文</button>
+        <a className="text-button" style={{marginLeft:'auto',alignSelf:'center',fontSize:12.5}} href="#/discover">Bangumi 资料库 →</a>
+      </> : <>
+        <button type="button" aria-pressed={browse==='library'} onClick={()=>onBrowse('library')}>正文书库</button>
+        <button type="button" aria-pressed={false} onClick={()=>onBrowse('sources')}><Globe size={13} style={{marginRight:4,verticalAlign:'-2px'}}/>找书与嗅探</button>
+        <a className="text-button" style={{marginLeft:'auto',alignSelf:'center',fontSize:12.5}} href="#/shelf">返回书架 →</a>
+      </>}
     </nav>}
     {browse==='sources' && <CustomSourcesPanel workId={workId} initialQuery={work?.title || ''} onAddShelf={onAdd} onRead={onRead} onReloadLibrary={reload}/>}
     {!work && browse==='fiction' && <WebFiction shelf={shelf} bindings={index?.bindings} onRead={onRead} onSave={onAdd} onJump={onJump}/>}
