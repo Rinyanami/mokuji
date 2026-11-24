@@ -4,6 +4,7 @@
 
 **本地优先（Local-First）的三端阅读器 · Bangumi 级自定义书架 · 万能网页嗅探 · 六套拟真办公摸鱼工作台**
 
+[![Release](https://img.shields.io/github/v/release/Rinyanami/mokuji?color=5e6ad2&label=Download)](https://github.com/Rinyanami/mokuji/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-5e6ad2.svg)](#许可说明)
 [![Platforms](https://img.shields.io/badge/Platforms-Windows%20%7C%20Android%20%7C%20iOS%20%7C%20E--Ink-3b82f6.svg)](#多端覆盖矩阵)
 [![Local-First](https://img.shields.io/badge/Storage-SQLite%20%2B%20IndexedDB%20%2B%20S3%2FWebDAV-10b981.svg)](#架构与同步原理)
@@ -11,6 +12,18 @@
 支持 **Windows（WebView2 桌面单入口）**、**Android（原生离线 WebView APK）**、**iOS（免签名全屏 Web Clip + 快捷指令）**、**浏览器 PWA** 以及 **电纸书（OPDS 1.2 + E-Ink 极简网页）**。
 
 </div>
+
+---
+
+## 直接下载各端安装包（[Releases v2.0.0](https://github.com/Rinyanami/mokuji/releases/latest)）
+
+| 平台 | 安装包直链 | 说明 |
+| :--- | :--- | :--- |
+| **Windows (64位安装向导)** | [Mokuji-Setup-Win64-v2.0.0.exe](https://github.com/Rinyanami/mokuji/releases/download/v2.0.0/Mokuji-Setup-Win64-v2.0.0.exe) | 内置 Node.js 24 运行时与 WebView2 单入口，支持 `Ctrl+Alt+M` 全局老板键与托盘驻留 |
+| **Windows 分享压缩包** | [Mokuji-Windows-v2.0.0.zip](https://github.com/Rinyanami/mokuji/releases/download/v2.0.0/Mokuji-Windows-v2.0.0.zip) | 内含 `Mokuji-Setup-Win64-v2.0.0.exe` 与 `使用说明.txt` |
+| **Android 离线客户端** | [Mokuji-Android-v2.0.0.apk](https://github.com/Rinyanami/mokuji/releases/download/v2.0.0/Mokuji-Android-v2.0.0.apk) | 原生离线壳（全面屏安全区适配、`.txt`/`.epub`/`.cbz` 离线解析、全书搜索与七牛/WebDAV 同步） |
+| **iPhone / iOS** | [Mokuji-iPhone-Unsigned-v2.0.0.ipa](https://github.com/Rinyanami/mokuji/releases/download/v2.0.0/Mokuji-iPhone-Unsigned-v2.0.0.ipa) | 未签名 IPA（适用 TrollStore / 自签）；日常使用建议在电脑端开启「手机连接」后用 Safari 安装永久不掉签的 Web Clip |
+| **校验码** | [SHA256SUMS.txt](https://github.com/Rinyanami/mokuji/releases/download/v2.0.0/SHA256SUMS.txt) | 各端二进制包 SHA-256 哈希清单 |
 
 ---
 
