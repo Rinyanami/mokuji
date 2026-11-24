@@ -14,11 +14,25 @@ export type ReaderAppearance = (typeof readerModes)[number]['value'];
 export type ImmersiveProduct = Exclude<ReaderAppearance, 'normal'>;
 export type ReaderSurface = 'web' | 'desktop';
 export type UiTheme = 'light' | 'dark';
+export type ReaderPaperTheme = 'default' | 'sepia' | 'green' | 'dark';
 
 const appearanceKey = 'mokuji.reader.appearance';
 const surfaceKey = 'mokuji.reader.surface';
 const appThemeKey = 'mokuji.ui.theme';
 const shellThemeKey = 'mokuji.reader.shellTheme';
+const paperThemeKey = 'mokuji.reader.paper';
+const lineHeightKey = 'mokuji.reader.lineHeight';
+
+export function defaultWorkspaceMode(): ImmersiveProduct {
+  if (typeof window !== 'undefined' && window.innerWidth <= 900) return 'notes';
+  return 'codex';
+}
+
+export function syncNativeStatusBar(theme: UiTheme) {
+  try {
+    (window as unknown as { MokujiNative?: { setSystemTheme?: (t: string) => void } }).MokujiNative?.setSystemTheme?.(theme);
+  } catch {}
+}
 
 export function readAppearance(): ReaderAppearance {
   try {
@@ -55,9 +69,31 @@ export function saveAppTheme(value: UiTheme) {
   if (typeof document !== 'undefined') {
     document.documentElement.dataset.theme = value;
   }
+  syncNativeStatusBar(value);
+}
+
+export function readPaperTheme(): ReaderPaperTheme {
   try {
-    (window as unknown as { MokujiNative?: { setSystemTheme?: (t: string) => void } }).MokujiNative?.setSystemTheme?.(value);
+    const val = localStorage.getItem(paperThemeKey);
+    if (val === 'sepia' || val === 'green' || val === 'dark') return val;
   } catch {}
+  return 'default';
+}
+
+export function savePaperTheme(value: ReaderPaperTheme) {
+  try { localStorage.setItem(paperThemeKey, value); } catch {}
+}
+
+export function readLineHeight(): number {
+  try {
+    const n = Number(localStorage.getItem(lineHeightKey));
+    if (n === 1.6 || n === 1.85 || n === 2.15) return n;
+  } catch {}
+  return 1.85;
+}
+
+export function saveLineHeight(value: number) {
+  try { localStorage.setItem(lineHeightKey, String(value)); } catch {}
 }
 
 export function defaultShellTheme(product: ImmersiveProduct, surface: ReaderSurface): UiTheme {

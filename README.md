@@ -1,8 +1,8 @@
 <div align="center">
 
-# 目次 · Mokuji v2.0
+# 目次 · Mokuji v2.1
 
-**本地优先（Local-First）的三端阅读器 · Bangumi 级自定义书架 · 万能网页嗅探 · 六套拟真办公摸鱼工作台**
+**本地优先（Local-First）的三端阅读器 · Bangumi 级自定义书架 · 万能网页嗅探 · 八套拟真办公摸鱼工作台**
 
 [![Release](https://img.shields.io/github/v/release/Rinyanami/mokuji?color=5e6ad2&label=Download)](https://github.com/Rinyanami/mokuji/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-5e6ad2.svg)](#许可说明)
@@ -15,15 +15,15 @@
 
 ---
 
-## 直接下载各端安装包（[Releases v2.0.0](https://github.com/Rinyanami/mokuji/releases/latest)）
+## 直接下载各端安装包（[Releases v2.1.0](https://github.com/Rinyanami/mokuji/releases/latest)）
 
 | 平台 | 安装包直链 | 说明 |
 | :--- | :--- | :--- |
-| **Windows (64位安装向导)** | [Mokuji-Setup-Win64-v2.0.0.exe](https://github.com/Rinyanami/mokuji/releases/download/v2.0.0/Mokuji-Setup-Win64-v2.0.0.exe) | 内置 Node.js 24 运行时与 WebView2 单入口，支持 `Ctrl+Alt+M` 全局老板键与托盘驻留 |
-| **Windows 分享压缩包** | [Mokuji-Windows-v2.0.0.zip](https://github.com/Rinyanami/mokuji/releases/download/v2.0.0/Mokuji-Windows-v2.0.0.zip) | 内含 `Mokuji-Setup-Win64-v2.0.0.exe` 与 `使用说明.txt` |
-| **Android 离线客户端** | [Mokuji-Android-v2.0.0.apk](https://github.com/Rinyanami/mokuji/releases/download/v2.0.0/Mokuji-Android-v2.0.0.apk) | 原生离线壳（全面屏安全区适配、`.txt`/`.epub`/`.cbz` 离线解析、全书搜索与七牛/WebDAV 同步） |
-| **iPhone / iOS** | [Mokuji-iPhone-Unsigned-v2.0.0.ipa](https://github.com/Rinyanami/mokuji/releases/download/v2.0.0/Mokuji-iPhone-Unsigned-v2.0.0.ipa) | 未签名 IPA（适用 TrollStore / 自签）；日常使用建议在电脑端开启「手机连接」后用 Safari 安装永久不掉签的 Web Clip |
-| **校验码** | [SHA256SUMS.txt](https://github.com/Rinyanami/mokuji/releases/download/v2.0.0/SHA256SUMS.txt) | 各端二进制包 SHA-256 哈希清单 |
+| **Windows (64位安装向导)** | [Mokuji-Setup-Win64-v2.1.0.exe](https://github.com/Rinyanami/mokuji/releases/download/v2.1.0/Mokuji-Setup-Win64-v2.1.0.exe) | 内置 Node.js 24 运行时与 WebView2 单入口，支持 `Ctrl+Alt+M` 全局老板键与托盘驻留 |
+| **Windows 分享压缩包** | [Mokuji-Windows-v2.1.0.zip](https://github.com/Rinyanami/mokuji/releases/download/v2.1.0/Mokuji-Windows-v2.1.0.zip) | 内含 `Mokuji-Setup-Win64-v2.1.0.exe` 与 `使用说明.txt` |
+| **Android 离线客户端** | [Mokuji-Android-v2.1.0.apk](https://github.com/Rinyanami/mokuji/releases/download/v2.1.0/Mokuji-Android-v2.1.0.apk) | 原生离线壳（全面屏安全区适配、`.txt`/`.epub`/`.cbz` 离线解析、备忘录/飞书伪装与七牛/WebDAV 同步） |
+| **iPhone / iOS** | [Mokuji-iPhone-Unsigned-v2.1.0.ipa](https://github.com/Rinyanami/mokuji/releases/download/v2.1.0/Mokuji-iPhone-Unsigned-v2.1.0.ipa) | 未签名 IPA（适用 TrollStore / 自签）；日常使用建议在电脑端开启「手机连接」后用 Safari 安装永久不掉签的 Web Clip |
+| **校验码** | [SHA256SUMS.txt](https://github.com/Rinyanami/mokuji/releases/download/v2.1.0/SHA256SUMS.txt) | 各端二进制包 SHA-256 哈希清单 |
 
 ---
 
@@ -35,7 +35,9 @@
 | ![移动端我的书架](docs/screenshots/mobile-shelf-light.png) | ![移动端书源嗅探](docs/screenshots/mobile-sources-light.png) | ![移动端个人主页](docs/screenshots/mobile-profile-dark.png) | ![移动端分类弹窗](docs/screenshots/mobile-bottomsheet-light.png) |
 
 <p align="center">
-  <img src="docs/screenshots/mobile-codex-workspace.png" alt="移动端 Codex 工作区模式" width="320" />
+  <img src="docs/screenshots/mobile-notes-disguise.png" alt="移动端手机备忘录伪装阅读" width="240" />
+  <img src="docs/screenshots/mobile-feishu-disguise.png" alt="移动端飞书文档伪装阅读" width="240" />
+  <img src="docs/screenshots/mobile-normal-reader.png" alt="移动端护眼绿正常阅读" width="240" />
 </p>
 
 ### 桌面端书架、多书源嗅探、拟真工作台 & 电纸书
@@ -61,10 +63,11 @@
   - `.txt`（智能章节识别、UTF-8 / GB18030 自动解码）
   - `.epub`（自动解包目录与内嵌插图图文混排）
   - `.cbz` / `.zip`（多话图片漫画包自动分话渲染）
-  - 内置 **「搜全书正文」** 跨章关键词检索与 **「书签/批注」** 段落笔记持久化。
+  - 内置 **「搜全书正文」** 跨章关键词检索、**「书签/批注」**、**选中划线笔记** 与 **一键导出 Markdown 笔记**。
 
-### 2. 六套拟真摸鱼工作区（按需拆包 · 零延迟防窥）
-通过 `React.lazy` 按需加载拆包，可在阅读页面无缝切换 **Codex**、**Claude**、**WorkBuddy**、**豆包**、**Antigravity**、**VS Code** 六套拟真办公壳，支持网页版/桌面版形态与浅色/深色主题：
+### 2. 八套拟真摸鱼工作区（移动端备忘录 / 飞书文档 + 桌面工作台）
+通过 `React.lazy` 按需加载拆包，可在阅读页面无缝切换 **手机备忘录（移动端默认）**、**飞书文档**、**Codex**、**Claude**、**WorkBuddy**、**豆包**、**Antigravity**、**VS Code** 八套拟真办公壳，支持网页版/桌面版形态、浅色/深色主题与四套护眼纸张底色（默认 / 暖纸 / 护眼绿 / 暗夜）：
+- **移动端手势与沉浸**：正文区支持左右滑动切章、点击空白处收起/呼出工具栏、`Aa` 排版抽屉实时调节字号/行距与章节进度条。
 - **`Ctrl + Alt + M`**（Windows 客户端）：全局老板键，任何窗口焦点下瞬间隐藏或呼出目次窗口；点关闭按钮最小化至系统托盘。
 - **`Ctrl + Shift + W`**：同窗口一键在「我的书架」与「摸鱼工作区」之间切换。
 - **`Space`（空格）**：工作区内瞬间切为伪装工作摘要与项目附件，再按一次回到阅读段落。

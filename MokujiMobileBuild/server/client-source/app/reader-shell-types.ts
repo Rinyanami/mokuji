@@ -1,11 +1,11 @@
 import type { ReactNode } from 'react';
-import type { ImmersiveProduct, ReaderAppearance, ReaderSurface, UiTheme } from './reader-appearance';
+import type { ImmersiveProduct, ReaderAppearance, ReaderPaperTheme, ReaderSurface, UiTheme } from './reader-appearance';
 import type { BookPoint, SavedPoint } from './reader-bookmarks';
 import type { ChapterInfo } from './reading-client';
 import type { WorkHints } from './reader-work-hints';
 import type { WorkProject } from './reader-workspaces';
 
-export type { ImmersiveProduct, ReaderAppearance, ReaderSurface, UiTheme };
+export type { ImmersiveProduct, ReaderAppearance, ReaderPaperTheme, ReaderSurface, UiTheme };
 
 export type ReaderShellProps = {
   product: ImmersiveProduct;
@@ -38,6 +38,10 @@ export type ReaderShellProps = {
   /* Rich hidden-interaction hooks shared across all six simulated shells */
   fontSize?: number;
   onFontSize?: (size: number) => void;
+  paperTheme?: ReaderPaperTheme;
+  onPaperTheme?: (theme: ReaderPaperTheme) => void;
+  lineHeight?: number;
+  onLineHeight?: (value: number) => void;
   workHints?: WorkHints;
   onWorkHints?: (next: WorkHints) => void;
   onSwitchAppearance?: (appearance: ReaderAppearance, surface?: ReaderSurface) => void;

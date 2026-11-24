@@ -1,9 +1,9 @@
 'use client';
 
 import { Fragment, Suspense, lazy, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, Bookmark, ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Bookmark, ChevronLeft, ChevronRight, ExternalLink, List, Search, Type } from 'lucide-react';
 import { externalUrl, readerPost, readerRequest, ReaderError, readingPosition, rememberOpened, type BookDetail, type ChapterText, type ReadingMark } from './reading-client';
-import { readerModes, readAppearance, saveAppearance, readSurface, saveSurface, readShellTheme, saveShellTheme, defaultShellTheme, type ReaderSurface, type ReaderAppearance, type UiTheme } from './reader-appearance';
+import { readerModes, readAppearance, saveAppearance, readSurface, saveSurface, readShellTheme, saveShellTheme, defaultShellTheme, defaultWorkspaceMode, readAppTheme, readPaperTheme, savePaperTheme, readLineHeight, saveLineHeight, syncNativeStatusBar, type ReaderPaperTheme, type ReaderSurface, type ReaderAppearance, type UiTheme } from './reader-appearance';
 import ReaderSettings from './reader-settings';
 import { ReaderMedia } from './reader-media';
 import {useReaderShortcuts} from './reader-shortcuts';
@@ -56,14 +56,18 @@ function ReaderSession({id,onBack,onSwitchBook}:ReaderViewProps) {
   const [workHints,setWorkHints]=useState(readWorkHints);
   const [appearance,setAppearance] = useState(()=>{
     const preferred=readAppearance();
-    return preferred==='normal' && location.hash===workspaceFragment(id) ? 'codex' : preferred;
+    return preferred==='normal' && location.hash===workspaceFragment(id) ? defaultWorkspaceMode() : preferred;
   });
   const [surface,setSurface] = useState(readSurface);
   const [shellTheme,setShellTheme] = useState<UiTheme>(() => {
     const initialMode = readAppearance();
     const initialSurface = readSurface();
-    return readShellTheme(initialMode === 'normal' ? 'codex' : initialMode, initialSurface);
+    return readShellTheme(initialMode === 'normal' ? defaultWorkspaceMode() : initialMode, initialSurface);
   });
+  const [paperTheme, setPaperTheme] = useState<ReaderPaperTheme>(readPaperTheme);
+  const [lineHeight, setLineHeight] = useState<number>(readLineHeight);
+  const [normalTypoOpen, setNormalTypoOpen] = useState(false);
+  const normalSwipe = useRef<{ x: number; y: number; t: number } | null>(null);
   const [copyNote, setCopyNote] = useState('');
   useEffect(() => {
     if (!copyNote) return;
@@ -140,13 +144,20 @@ function ReaderSession({id,onBack,onSwitchBook}:ReaderViewProps) {
   const workspace = appearance !== 'normal';
   useLayoutEffect(()=>{
     const enterWorkspace=()=>{
-      if (location.hash===workspaceFragment(id)) setAppearance(previous=>previous==='normal'?'codex':previous);
+      if (location.hash===workspaceFragment(id)) setAppearance(previous=>previous==='normal'?defaultWorkspaceMode():previous);
     };
     window.addEventListener('hashchange',enterWorkspace);
     return ()=>window.removeEventListener('hashchange',enterWorkspace);
   },[id]);
   useLayoutEffect(()=>{saveAppearance(appearance);},[appearance]);
   useLayoutEffect(()=>{syncReaderAddress(id,workspace);},[id,workspace]);
+  useEffect(()=>{
+    const activeTheme: UiTheme = workspace
+      ? (shellTheme === 'dark' || paperTheme === 'dark' ? 'dark' : 'light')
+      : (paperTheme === 'dark' ? 'dark' : readAppTheme());
+    syncNativeStatusBar(activeTheme);
+    return () => { syncNativeStatusBar(readAppTheme()); };
+  },[workspace, shellTheme, paperTheme]);
   const size=preferredSize ?? (workspace ? 16 : 20);
   useLayoutEffect(()=>{
     if (!workspace) return;
@@ -483,9 +494,28 @@ function ReaderSession({id,onBack,onSwitchBook}:ReaderViewProps) {
       : !workspace && notices}
     {workspace && !summaryOpen && loading && <p className="mokuji-work-status" role="status">正在载入工作区…</p>}
     {open && <div className={'duji-reader-sheet'+(workspace?' mokuji-shell-text':'')} ref={viewport} hidden={workspace && summaryOpen} inert={workspace && summaryOpen} tabIndex={0} role="region" aria-label={workspace?"工作记录正文":"章节正文"}
-      onScroll={currentParagraph} onWheel={()=>{manual.current=true;}} onTouchStart={()=>{manual.current=true;}}
-      onPointerDown={()=>{manual.current=true;}} onMouseUp={captureTextSelection} onTouchEnd={()=>{setTimeout(captureTextSelection, 60);}} onKeyDown={event=>{if(['ArrowDown','ArrowUp','PageDown','PageUp','Home','End',' '].includes(event.key))manual.current=true;}}>
-      <article style={{fontSize:size}}><CotexSourceFont fonts={open.text.sourceFonts} sourceUrl={open.text.sourceUrl}/>{workspace && <ReaderLede/>}
+      onScroll={currentParagraph} onWheel={()=>{manual.current=true;}}
+      onTouchStart={e=>{
+        manual.current=true;
+        if(!workspace && e.touches.length===1) normalSwipe.current={x:e.touches[0].clientX,y:e.touches[0].clientY,t:Date.now()};
+      }}
+      onPointerDown={()=>{manual.current=true;}} onMouseUp={captureTextSelection}
+      onTouchEnd={e=>{
+        setTimeout(captureTextSelection, 60);
+        if(!workspace && normalSwipe.current && e.changedTouches.length===1 && !disabled){
+          const s=normalSwipe.current; normalSwipe.current=null;
+          const sel=window.getSelection?.()?.toString()?.trim();
+          const dx=e.changedTouches[0].clientX-s.x, dy=e.changedTouches[0].clientY-s.y;
+          if(!sel && Date.now()-s.t<550 && Math.abs(dx)>72 && Math.abs(dx)>Math.abs(dy)*1.6){
+            if(dx<0 && at>=0 && at+1<chapters.length) void changeChapter(chapters[at+1].n);
+            else if(dx>0 && at>0) void changeChapter(chapters[at-1].n);
+          }
+        } else {
+          normalSwipe.current=null;
+        }
+      }}
+      onKeyDown={event=>{if(['ArrowDown','ArrowUp','PageDown','PageUp','Home','End',' '].includes(event.key))manual.current=true;}}>
+      <article style={{fontSize:size, lineHeight}}><CotexSourceFont fonts={open.text.sourceFonts} sourceUrl={open.text.sourceUrl}/>{workspace && <ReaderLede/>}
         {!workspace && <header className="duji-chapter-heading"><h2>{chapterTitle}</h2></header>}
         {open.text.paragraphs.map((text,i)=><Fragment key={chapter+':'+i}>{imagesByParagraph.has(i)&&<ReaderMedia bookId={id} chapter={chapter} group={imagesByParagraph.get(i)!} {...mediaState} remoteClosed={marks.collapsedImages.includes(chapter+':'+i)} media={open.text.media} workspace={workspace}/>}<div data-line={i+1} className={'duji-reader-paragraph'+(paragraph===i?' marked':'')}>
           <p data-p={i}>{renderParaText(text, i)}</p>
@@ -503,7 +533,7 @@ function ReaderSession({id,onBack,onSwitchBook}:ReaderViewProps) {
   </>;
 
   const indexUI=<>
-    {index&&<ReaderRecordIndex bookId={id} chapters={chapters} marks={marks.marks} highlights={hl.highlights} current={{chapter,paragraph}} workspace={workspace} tab={index.tab} initialQuery={index.query} busy={marks.busy} loading={disabled}
+    {index&&<ReaderRecordIndex bookId={id} bookTitle={bookTitle} chapters={chapters} marks={marks.marks} highlights={hl.highlights} current={{chapter,paragraph}} workspace={workspace} tab={index.tab} initialQuery={index.query} busy={marks.busy} loading={disabled}
       onGo={goToPoint} onClose={()=>setIndex(null)} onRemove={p=>void marks.change(p,'remove')} onMark={()=>{if(open)void marks.change({chapter,paragraph});}} onSaveNote={marks.setNote} onUpdateHighlightNote={hl.updateHighlightNote} onRemoveHighlight={hl.removeHighlight}/>}
     {(selDraft || activeHl) && <div className="mokuji-sel-bar" role="dialog" aria-label="划线笔记工具条">
       {selDraft && !hlNoteMode && <>
@@ -551,6 +581,14 @@ function ReaderSession({id,onBack,onSwitchBook}:ReaderViewProps) {
     setShellTheme(value);
     saveShellTheme(value);
   }
+  function changePaperTheme(value: ReaderPaperTheme) {
+    setPaperTheme(value);
+    savePaperTheme(value);
+  }
+  function changeLineHeight(value: number) {
+    setLineHeight(value);
+    saveLineHeight(value);
+  }
   const bookmarked = marks.marks.some(point => point.chapter === chapter && point.paragraph === paragraph);
   const progressPercent = chapters.length
     ? Math.min(100, Math.max(0, ((Math.max(0, at) + (paragraph + 1) / Math.max(1, unitCount)) / chapters.length) * 100))
@@ -563,17 +601,36 @@ function ReaderSession({id,onBack,onSwitchBook}:ReaderViewProps) {
       .catch(() => setCopyNote('复制失败，请检查剪贴板权限'));
   }
 
-  if (appearance==='normal') return <section className="duji-reader" data-appearance="normal" aria-label="正文阅读">
+  if (appearance==='normal') return <section className="duji-reader" data-appearance="normal" data-paper={paperTheme} aria-label="正文阅读">
     <div className="duji-reader-top">
       <button type="button" className="button button-outline" onClick={()=>void back()}><ArrowLeft size={15}/>返回</button>
       <div className="duji-reader-heading"><h1>{bookTitle || '正文阅读'}</h1>{detail?.book.author && <p>{detail.book.author}</p>}</div>
       {picker}
     </div>
     {chapterTools}
-    {indexActions}
+    <div className="duji-reader-quickbar">
+      <button type="button" className="button button-outline" disabled={!detail} onClick={()=>{setSettingsOpen(false);setIndex({tab:'search',query:''});}}><List size={14}/>目录/搜正文</button>
+      <button type="button" className="button button-outline" disabled={!detail} onClick={()=>{setSettingsOpen(false);setIndex({tab:'highlights',query:''});}}><Search size={14}/>笔记 ({marks.marks.length + hl.highlights.length})</button>
+      <button type="button" className="button button-outline" aria-pressed={normalTypoOpen} onClick={()=>setNormalTypoOpen(v=>!v)}><Type size={14}/>排版护眼</button>
+      <button type="button" className="button button-outline" disabled={!open||disabled||marks.busy} onClick={()=>void marks.change({chapter,paragraph})}><Bookmark size={14} fill={bookmarked?'currentColor':'none'}/>{bookmarked?'已标记':'记书签'}</button>
+    </div>
+    {normalTypoOpen && <div className="duji-normal-typo" role="region" aria-label="纸张与排版设置">
+      <div className="duji-typo-group">
+        <span>纸张</span>
+        {([['default','默认'],['sepia','暖纸'],['green','护眼绿'],['dark','暗夜']] as const).map(([val,label])=>(
+          <button key={val} type="button" className={'duji-paper-btn is-'+val+(paperTheme===val?' active':'')} aria-pressed={paperTheme===val} onClick={()=>changePaperTheme(val)}>{label}</button>
+        ))}
+      </div>
+      <div className="duji-typo-group">
+        <span>行距</span>
+        {([[1.6,'紧凑'],[1.85,'舒适'],[2.15,'宽松']] as const).map(([val,label])=>(
+          <button key={val} type="button" className={'duji-lh-btn'+(Math.abs(lineHeight-val)<0.05?' active':'')} aria-pressed={Math.abs(lineHeight-val)<0.05} onClick={()=>changeLineHeight(val)}>{label}</button>
+        ))}
+      </div>
+    </div>}
     {content}
     {indexUI}
-    {open && <div className="duji-reader-position"><span>点段落旁的书签可保存或移除标记，并记住该段。</span><span>第 {chapter+1} 章 · 第 {paragraph+1} / {unitCount} 段</span></div>}
+    {open && <div className="duji-reader-position"><span>第 {chapter+1}/{chapters.length} 章 · {progressPercent.toFixed(0)}% · 第 {paragraph+1}/{unitCount} 段</span><span>左右滑切章 · 选字可划线记笔记</span></div>}
     {navigation}
   </section>;
 
@@ -587,7 +644,7 @@ function ReaderSession({id,onBack,onSwitchBook}:ReaderViewProps) {
       projects={workspaces.sidebar} onProjects={workspaces.show} onProject={target=>void workspaces.select(target)} onImportFiles={workspaces.chooseFiles}
       onFindRecord={searchRecords} onToggleSummary={toggleSummary} summaryOpen={summaryOpen} chapters={aliasedChapters} chapter={chapter} paragraph={paragraph} paragraphCount={unitCount} disabled={disabled}
       onChapter={n=>{if (summaryOpen) toggleSummary();void changeChapter(n);}} onSettings={()=>setSettingsOpen(true)} onBack={()=>void back()}
-      fontSize={size} onFontSize={resize} workHints={workHints} onWorkHints={changeWorkHints}
+      fontSize={size} onFontSize={resize} paperTheme={paperTheme} onPaperTheme={changePaperTheme} lineHeight={lineHeight} onLineHeight={changeLineHeight} workHints={workHints} onWorkHints={changeWorkHints}
       onSwitchAppearance={(next, nextSurface)=>{
         changeAppearance(next);
         if(nextSurface) changeSurface(nextSurface);

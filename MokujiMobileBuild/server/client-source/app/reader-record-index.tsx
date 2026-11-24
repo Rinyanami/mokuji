@@ -1,5 +1,5 @@
 import {useEffect,useMemo,useRef,useState} from 'react';
-import {Bookmark,FileSearch,Highlighter,PenLine,Search,X} from 'lucide-react';
+import {Bookmark,Download,FileSearch,Highlighter,PenLine,Search,X} from 'lucide-react';
 import {readerRequest,type ChapterInfo,type ChapterText} from './reading-client';
 import type {BookPoint,SavedPoint} from './reader-bookmarks';
 import type {TextHighlight} from './reader-highlights';
@@ -32,8 +32,8 @@ export function findReaderChapters(chapters:readonly ChapterInfo[],query:string)
 
 type TextMatch={chapter:number;chapterTitle:string;paragraph:number;snippet:string};
 
-export function ReaderRecordIndex({bookId,chapters,marks,highlights=[],current,workspace,busy,loading,tab,initialQuery,onClose,onGo,onRemove,onMark,onSaveNote,onUpdateHighlightNote,onRemoveHighlight}:{
-  bookId?:string;chapters:readonly ChapterInfo[];marks:SavedPoint[];highlights?:TextHighlight[];current:BookPoint;workspace:boolean;busy:boolean;loading:boolean;
+export function ReaderRecordIndex({bookId,bookTitle,chapters,marks,highlights=[],current,workspace,busy,loading,tab,initialQuery,onClose,onGo,onRemove,onMark,onSaveNote,onUpdateHighlightNote,onRemoveHighlight}:{
+  bookId?:string;bookTitle?:string;chapters:readonly ChapterInfo[];marks:SavedPoint[];highlights?:TextHighlight[];current:BookPoint;workspace:boolean;busy:boolean;loading:boolean;
   tab:'search'|'marks'|'highlights';initialQuery:string;onClose:()=>void;onGo:(p:BookPoint)=>void;onRemove:(p:BookPoint)=>void;onMark:()=>void;onSaveNote?:(p:BookPoint,note:string)=>void;onUpdateHighlightNote?:(id:string,note:string)=>void;onRemoveHighlight?:(id:string)=>void;
 }){
   const [view,setView]=useState<'search'|'fulltext'|'marks'|'highlights'>(tab),[query,setQuery]=useState(initialQuery),[limit,setLimit]=useState(100);
@@ -41,6 +41,7 @@ export function ReaderRecordIndex({bookId,chapters,marks,highlights=[],current,w
   const [fullHits,setFullHits]=useState<TextMatch[]>([]);
   const [fullSearching,setFullSearching]=useState(false);
   const [fullNote,setFullNote]=useState('');
+  const [exportNotice,setExportNotice]=useState('');
   const [editingNoteKey,setEditingNoteKey]=useState('');
   const [noteDraft,setNoteDraft]=useState('');
   const [editingHlId,setEditingHlId]=useState('');
@@ -51,6 +52,41 @@ export function ReaderRecordIndex({bookId,chapters,marks,highlights=[],current,w
   const hits=useMemo(()=>findReaderChapters(chapters,query),[chapters,query]);
   const title=(c:ChapterInfo)=>workspace?taskAlias(c.n):c.title;
   const marked=marks.some(m=>m.chapter===current.chapter&&m.paragraph===current.paragraph);
+
+  function exportNotesMarkdown(){
+    const name=(bookTitle||'阅读笔记').trim();
+    const lines:string[]=[`# 《${name}》阅读笔记与书签`,`> 导出时间：${new Date().toLocaleString('zh-CN')}`,''];
+    if(highlights.length){
+      lines.push(`## 划线与笔记 (${highlights.length})`,'');
+      for(const h of highlights){
+        const c=chapters.find(x=>x.n===h.chapter);
+        const chName=c?(c.realTitle||c.title):`第 ${h.chapter+1} 章`;
+        lines.push(`### ${chName} · 第 ${h.paragraph+1} 段`,'',`> ${h.quote}`,'');
+        if(h.note) lines.push(`- **笔记**：${h.note}`,'');
+      }
+    }
+    if(marks.length){
+      lines.push(`## 书签与批注 (${marks.length})`,'');
+      for(const m of marks){
+        const c=chapters.find(x=>x.n===m.chapter);
+        const chName=c?(c.realTitle||c.title):`第 ${m.chapter+1} 章`;
+        lines.push(`- **${chName} · 第 ${m.paragraph+1} 段**${m.note?`：${m.note}`:''}`);
+      }
+      lines.push('');
+    }
+    const md=lines.join('\n');
+    try{
+      const blob=new Blob([md],{type:'text/markdown;charset=utf-8'});
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');
+      a.href=url;a.download=`${name.replace(/[\\/:*?"<>|]/g,'_')}-笔记.md`;
+      document.body.appendChild(a);a.click();a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),1000);
+    }catch{}
+    void navigator.clipboard?.writeText(md).catch(()=>{});
+    setExportNotice('已导出 Markdown 并复制到剪贴板');
+    setTimeout(()=>setExportNotice(''),2500);
+  }
 
   async function runFullTextSearch(){
     const q=fullQuery.trim();
@@ -114,7 +150,12 @@ export function ReaderRecordIndex({bookId,chapters,marks,highlights=[],current,w
         <small style={{fontSize:12,color:'#374151',lineHeight:1.45}}>{m.snippet}</small>
       </button>)}</div>
     </>}
-    {view==='marks'&&<><button type="button" className="mokuji-mark-location" onClick={onMark} disabled={busy||loading}>{marked?'取消当前位置标记':'标记当前位置'}</button>
+    {view==='marks'&&<>
+      <div style={{display:'flex',gap:8,alignItems:'center'}}>
+        <button type="button" className="mokuji-mark-location" style={{flex:1}} onClick={onMark} disabled={busy||loading}>{marked?'取消当前位置标记':'标记当前位置'}</button>
+        {(marks.length>0||highlights.length>0)&&<button type="button" className="mokuji-mark-location" style={{width:'auto',padding:'0 12px',display:'inline-flex',alignItems:'center',gap:5}} onClick={exportNotesMarkdown}><Download size={14}/>导出 MD</button>}
+      </div>
+      {exportNotice&&<p style={{fontSize:12,color:'#10b981',margin:'4px 0'}}>{exportNotice}</p>}
       <div className="mokuji-index-list">{marks.map(m=>{const c=chapters.find(c=>c.n===m.chapter);if(!c)return null;
         const mKey=m.chapter+':'+m.paragraph;const isEditing=editingNoteKey===mKey;
         return <div key={mKey} style={{borderBottom:'1px solid #f1f5f9',padding:'4px 0'}}>
@@ -130,7 +171,12 @@ export function ReaderRecordIndex({bookId,chapters,marks,highlights=[],current,w
           </form>}
         </div>;})}
         {!marks.length&&<p>还没有标记，在阅读时点书签即可添加与批注。</p>}</div></>}
-    {view==='highlights'&&<div className="mokuji-index-list">
+    {view==='highlights'&&<>
+      {(marks.length>0||highlights.length>0)&&<div style={{display:'flex',justifyContent:'flex-end',marginBottom:6}}>
+        <button type="button" className="mokuji-mark-location" style={{width:'auto',padding:'0 12px',display:'inline-flex',alignItems:'center',gap:5}} onClick={exportNotesMarkdown}><Download size={14}/>导出 Markdown 笔记</button>
+      </div>}
+      {exportNotice&&<p style={{fontSize:12,color:'#10b981',margin:'4px 0'}}>{exportNotice}</p>}
+      <div className="mokuji-index-list">
       {highlights.map(h=>{const c=chapters.find(x=>x.n===h.chapter);const chLabel=c?title(c):`第 ${h.chapter+1} 章`;const isEd=editingHlId===h.id;
         return <div key={h.id} style={{borderBottom:'1px solid #f1f5f9',padding:'8px 4px'}}>
           <div style={{display:'flex',alignItems:'center',gap:6}}>
@@ -149,6 +195,6 @@ export function ReaderRecordIndex({bookId,chapters,marks,highlights=[],current,w
           </form>}
         </div>;})}
       {!highlights.length&&<p>还没有划线笔记，在正文中选中文字即可高亮并记录想法。</p>}
-    </div>}
+    </div></>}
   </dialog>;
 }

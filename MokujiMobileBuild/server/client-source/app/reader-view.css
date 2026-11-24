@@ -36,6 +36,33 @@
 .duji-reader-credit a, .duji-reader-message a { display: inline-flex; align-items: center; gap: 4px; color: var(--coral); text-decoration: underline; }
 .duji-reader-position { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; color: var(--muted); font-size: 12px; margin: 8px 0 4px; font-variant-numeric: tabular-nums; }
 .duji-reader-nav, .mokuji-settings-bottom { display: flex; justify-content: space-between; gap: 12px; margin-top: 10px; }
+.duji-reader-quickbar {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;
+}
+.duji-reader-quickbar .button { font-size: 12.5px; padding: 5px 10px; }
+.duji-normal-typo {
+  display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center;
+  padding: 10px 12px; margin-bottom: 10px; border-radius: 10px;
+  border: 1px solid var(--line); background: var(--surface-subtle); font-size: 12.5px;
+}
+.duji-typo-group { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.duji-typo-group > span { color: var(--muted); font-size: 12px; margin-right: 2px; }
+.duji-paper-btn, .duji-lh-btn {
+  padding: 4px 10px; border-radius: 7px; border: 1px solid var(--line-strong);
+  font-size: 12px; cursor: pointer; background: var(--surface); color: var(--ink);
+}
+.duji-paper-btn.is-sepia { background: #f6eedb; color: #3c2f1e; }
+.duji-paper-btn.is-green { background: #e7f1e8; color: #1f3324; }
+.duji-paper-btn.is-dark { background: #1c1e24; color: #e5e7eb; }
+.duji-paper-btn.active, .duji-lh-btn.active {
+  outline: 2px solid var(--coral); outline-offset: 1px; font-weight: 600;
+}
+.duji-reader[data-paper="sepia"] .duji-reader-sheet { background: #f6eedb; color: #3c2f1e; border-color: rgba(94, 71, 41, 0.16); }
+.duji-reader[data-paper="sepia"] .duji-reader-sheet h2 { color: #2b2114; }
+.duji-reader[data-paper="green"] .duji-reader-sheet { background: #e7f1e8; color: #1f3324; border-color: rgba(31, 51, 36, 0.16); }
+.duji-reader[data-paper="green"] .duji-reader-sheet h2 { color: #152519; }
+.duji-reader[data-paper="dark"] .duji-reader-sheet { background: #141518; color: #e5e7eb; border-color: rgba(255, 255, 255, 0.12); }
+.duji-reader[data-paper="dark"] .duji-reader-sheet h2 { color: #f8fafc; }
 .duji-reader .button, .mokuji-reader-settings .button { display: inline-flex; align-items: center; gap: 5px; min-height: 34px; }
 .duji-reader-state, .duji-reader-message { padding: 14px 16px; background: var(--surface-subtle); border: 1px solid var(--line); color: var(--ink); border-radius: 9px; margin: 9px 0; font-size: 13px; }
 .duji-reader-message > p { margin: 0 0 9px; }

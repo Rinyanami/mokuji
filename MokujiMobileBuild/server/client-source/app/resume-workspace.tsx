@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { readAppearance, readerModes, saveAppearance } from './reader-appearance';
+import { defaultWorkspaceMode, readAppearance, readerModes, saveAppearance } from './reader-appearance';
 import { lastOpened, readerRequest, type ReaderIndex } from './reading-client';
 import { setTabAppearance, workspaceFragment } from './work-route';
 
@@ -18,7 +18,7 @@ export default function ResumeWorkspace(){
   useEffect(()=>{
     const abort=new AbortController();
     const selected=readAppearance();
-    const product=selected==='normal'?'codex':selected;
+    const product=selected==='normal'?defaultWorkspaceMode():selected;
     saveAppearance(product);
     setTabAppearance(readerModes.find(item=>item.value===product)?.label);
     readerRequest<ReaderIndex>('books',{signal:abort.signal}).then(index=>{
